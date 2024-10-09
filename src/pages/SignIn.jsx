@@ -9,10 +9,12 @@ import {
   signInSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 export default function SignIn() {
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     studentId: "",
     password: "",
@@ -29,13 +31,18 @@ export default function SignIn() {
       dispatch(signInStart());
       const response = await authApi.signIn(formData);
       if (response.data) {
-        console.log(response.data);
         toast.success("Đăng nhập thành công!");
         // Lưu token vào localStorage
         localStorage.setItem("accessToken", response.data.token.accessToken);
         localStorage.setItem("refreshToken", response.data.token.refreshToken);
-        console.log(response.data);
         dispatch(signInSuccess(response.data.user));
+
+        // Kiểm tra vai trò người dùng, nếu là admin thì điều hướng tới /dashboard
+        if (response.data.user.role.name === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/"); // Điều hướng tới trang khác nếu không phải admin
+        }
       }
     } catch (error) {
       console.error("Failed to sign in: ", error);
