@@ -1,12 +1,14 @@
 import { Sidebar } from "flowbite-react";
-import { HiChartPie, HiShoppingBag, HiTable } from "react-icons/hi";
+import { HiArchive, HiChartPie, HiShoppingBag } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import logo from "../../assets/imgs/logo.png";
 import { Link, useLocation } from "react-router-dom";
+import { GoDot } from "react-icons/go";
+import { BsFillPersonBadgeFill } from "react-icons/bs";
+import { MdReviews } from "react-icons/md";
 
 export default function DashSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selectedItem, setSelectedItem] = useState("Dashboard");
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -62,6 +64,8 @@ export default function DashSidebar() {
           } `}
         >
           <Sidebar.ItemGroup className="">
+
+            {/* DASHBOARD */}
             <Sidebar.Item active={tab === "dashboard"}>
               {isCollapsed ? (
                 <div className=" p-5">
@@ -70,47 +74,132 @@ export default function DashSidebar() {
                   </Link>
                 </div>
               ) : (
-                <Link
-                  to={"/dashboard?tab=dashboard"}
-                  className="flex gap-0 items-center p-4"
-                >
-                  <HiChartPie size={30} />
-                  <span className="ml-2 text-xl">Dashboard</span>
-                </Link>
+                <div className="py-2">
+                  <Sidebar.Item active={tab === "dashboard"} icon={HiChartPie}>
+                    <Link to={"/dashboard?tab=dashboard"}>Dashboard</Link>
+                  </Sidebar.Item>
+                </div>
               )}
             </Sidebar.Item>
-            <Sidebar.Item active={tab === "products"}>
-              {isCollapsed ? (
+
+            {/* PRODUCTS */}
+            {isCollapsed ? (
+              <Sidebar.Item active={tab === "products"}>
                 <div className=" p-5">
                   <Link to={"/dashboard?tab=products"}>
-                    <HiTable size={35} />
-                  </Link>
-                </div>
-              ) : (
-                <Link
-                  to={"/dashboard?tab=products"}
-                  className="flex gap-0 items-center p-4"
-                >
-                  <HiTable size={30} />
-                  <span className="ml-2 text-xl">Table</span>
-                </Link>
-              )}
-            </Sidebar.Item>
-            <Sidebar.Item active={tab === "addProducts"}>
-              {isCollapsed ? (
-                <div className=" p-5">
-                  <Link to={"/dashboard?tab=addProducts"}>
                     <HiShoppingBag size={35} />
                   </Link>
                 </div>
+              </Sidebar.Item>
+            ) : (
+              <Sidebar.Collapse
+                icon={HiShoppingBag}
+                className="p-6"
+                label="Products"
+              >
+                <Sidebar.Item active={tab === "products"}>
+                  <Link
+                    to={"/dashboard?tab=products"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">List</span>
+                  </Link>
+                </Sidebar.Item>
+                <Sidebar.Item active={tab === "addProducts"}>
+                  <Link
+                    to={"/dashboard?tab=addProducts"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">Add</span>
+                  </Link>
+                </Sidebar.Item>
+              </Sidebar.Collapse>
+            )}
+
+            {/* ORDERS */}
+            {isCollapsed ? (
+              <Sidebar.Item active={tab === "orders"}>
+                <div className=" p-5">
+                  <Link to={"/dashboard?tab=orders"}>
+                    <HiArchive size={35} />
+                  </Link>
+                </div>
+              </Sidebar.Item>
+            ) : (
+              <Sidebar.Collapse icon={HiArchive} className="p-6" label="Orders">
+                <Sidebar.Item active={tab === "listOrders"}>
+                  <Link
+                    to={"/dashboard?tab=products"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">List</span>
+                  </Link>
+                </Sidebar.Item>
+                <Sidebar.Item active={tab === "detailOrders"}>
+                  <Link
+                    to={"/dashboard?tab=addProducts"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">Details</span>
+                  </Link>
+                </Sidebar.Item>
+              </Sidebar.Collapse>
+            )}
+
+            {/* CUSTOMER */}
+            {isCollapsed ? (
+              <Sidebar.Item active={tab === "customers"}>
+                <div className=" p-5">
+                  <Link to={"/dashboard?tab=customers"}>
+                    <BsFillPersonBadgeFill size={35} />
+                  </Link>
+                </div>
+              </Sidebar.Item>
+            ) : (
+              <Sidebar.Collapse
+                icon={BsFillPersonBadgeFill}
+                className="p-6"
+                label="Customers"
+              >
+                <Sidebar.Item active={tab === "listCustomers"}>
+                  <Link
+                    to={"/dashboard?tab=listCustomers"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">List</span>
+                  </Link>
+                </Sidebar.Item>
+                <Sidebar.Item active={tab === "detailCustomer"}>
+                  <Link
+                    to={"/dashboard?tab=detailCustomer"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">Details</span>
+                  </Link>
+                </Sidebar.Item>
+              </Sidebar.Collapse>
+            )}
+
+            {/* REVIEW */}
+            <Sidebar.Item active={tab === "reviews"}>
+              {isCollapsed ? (
+                <div className=" p-5">
+                  <Link to={"/dashboard?tab=dashboard"}>
+                    <MdReviews size={35} />
+                  </Link>
+                </div>
               ) : (
-                <Link
-                  to={"/dashboard?tab=addProducts"}
-                  className="flex gap-0 items-center p-4"
-                >
-                  <HiShoppingBag size={30} />
-                  <span className="ml-2 text-xl">Products</span>
-                </Link>
+                <div className="py-2">
+                  <Sidebar.Item active={tab === "review"} icon={MdReviews}>
+                    <Link to={"/dashboard?tab=dashboard"}>Manager Reivew</Link>
+                  </Sidebar.Item>
+                </div>
               )}
             </Sidebar.Item>
           </Sidebar.ItemGroup>
