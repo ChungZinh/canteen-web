@@ -7,6 +7,8 @@ import DashAddProduct from "../components/dashboard/DashAddProduct";
 import DashboardM from "../components/dashboard/Dashboard";
 import DashListCustomers from "../components/dashboard/DashListCustomers";
 import DashDetailCustomer from "../components/dashboard/DashDetailCustomer";
+import DashListOrder from "../components/dashboard/DashListOrders";
+import DashDetailOrder from "../components/dashboard/DashDetailOrder";
 export default function Dashboard() {
   const location = useLocation();
   const [tab, setTab] = useState("");
@@ -29,6 +31,8 @@ export default function Dashboard() {
       {tab === "addCategory" && <DashAddProduct />}
       {tab === "listCustomers" && <DashListCustomers />}
       {tab === "detailCustomer" && <DashDetailCustomer />}
+      {tab === "listOrders" && <DashListOrder />}
+      {tab === "detailOrders" && <DashDetailOrder />}
     </div>
   );
 }

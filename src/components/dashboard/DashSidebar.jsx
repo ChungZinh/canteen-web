@@ -131,7 +131,7 @@ export default function DashSidebar() {
               <Sidebar.Collapse icon={HiArchive} className="p-6" label="Orders">
                 <Sidebar.Item active={tab === "listOrders"}>
                   <Link
-                    to={"/dashboard?tab=products"}
+                    to={"/dashboard?tab=listOrders"}
                     className="flex gap-0 items-center"
                   >
                     <GoDot />
@@ -140,7 +140,7 @@ export default function DashSidebar() {
                 </Sidebar.Item>
                 <Sidebar.Item active={tab === "detailOrders"}>
                   <Link
-                    to={"/dashboard?tab=addProducts"}
+                    to={"/dashboard?tab=detailOrders"}
                     className="flex gap-0 items-center"
                   >
                     <GoDot />
