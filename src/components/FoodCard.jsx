@@ -1,9 +1,9 @@
 import food from "../assets/imgs/img1.png";
-export default function FoodCard({ size }) {
+export default function FoodCard({ size, cart }) {
   return (
     <div className="">
       {size === "small" ? (
-        <div className="w-[280px] h-[380px] bg-white shadow-md flex flex-col border shadow-neutral-400 rounded-2xl">
+        <div className="w-[280px] h-[380px] bg-white shadow-md   flex flex-col border shadow-neutral-400 rounded-2xl">
           <div className=" h-4/6 flex justify-center items-center border-b">
             <div className="w-36 h-36 rounded-full overflow-hidden ">
               <img src={food} className="w-36 h-36 object-cover" />

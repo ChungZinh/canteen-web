@@ -15,6 +15,26 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+    // Xác định mục active dựa trên URL hiện tại
+    const getSelectedNav = () => {
+      switch (location.pathname) {
+        case "/":
+          return "home";
+        case "/products":
+          return "products";
+        case "/about":
+          return "about";
+        case "/contact":
+          return "contact";
+        case "/recruitment":
+          return "recruitment";
+        default:
+          return "home";
+      }
+    };
+  
+    const [selected, setSelected] = useState(getSelectedNav());
+
   useEffect(() => {
     const handleScroll = () => {
       const headerHeight = 100; // Chiều cao của header (px)
@@ -147,19 +167,44 @@ export default function Header() {
 
                 {/* Navbar Links */}
                 <Navbar.Collapse>
-                  <Navbar.Link className="lg:text-base" href="/" active>
+                  <Navbar.Link
+                    className="lg:text-base"
+                    href="/"
+                    active={selected === "home"}
+                    onClick={() => setSelected("home")}
+                  >
                     Trang chủ
                   </Navbar.Link>
-                  <Navbar.Link className="lg:text-base" href="/collections">
+                  <Navbar.Link
+                    className="lg:text-base"
+                    href="/products"
+                    onClick={() => setSelected("products")}
+                    active={selected === "products"}
+                  >
                     Sản phẩm
                   </Navbar.Link>
-                  <Navbar.Link className="lg:text-base" href="/about">
+                  <Navbar.Link
+                    className="lg:text-base"
+                    href="/about"
+                    onClick={() => setSelected("about")}
+                    active={selected === "about"}
+                  >
                     Giới thiệu
                   </Navbar.Link>
-                  <Navbar.Link className="lg:text-base" href="/contact">
+                  <Navbar.Link
+                    className="lg:text-base"
+                    href="/contact"
+                    onClick={() => setSelected("contact")}
+                    active={selected === "contact"}
+                  >
                     Liên hệ
                   </Navbar.Link>
-                  <Navbar.Link className="lg:text-base" href="/recruitment">
+                  <Navbar.Link
+                    className="lg:text-base"
+                    href="/recruitment"
+                    onClick={() => setSelected("recruitment")}
+                    active={selected === "recruitment"}
+                  >
                     Tuyển dụng
                   </Navbar.Link>
                 </Navbar.Collapse>

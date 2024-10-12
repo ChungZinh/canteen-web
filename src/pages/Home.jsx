@@ -4,7 +4,47 @@ import { GiForkKnifeSpoon } from "react-icons/gi";
 import bg from "../assets/imgs/bg1.jpg";
 import FoodCard from "../components/FoodCard";
 import { HiArrowLeftCircle, HiArrowRightCircle } from "react-icons/hi2";
+import { useRef } from "react";
 export default function Home() {
+  const sliderRef = useRef(null);
+
+  const scrollLeft = () => {
+    sliderRef.current.scrollBy({
+      left: -410, // Cuộn sang trái 300px
+      behavior: "smooth", // Cuộn mượt
+    });
+  };
+
+  const scrollRight = () => {
+    sliderRef.current.scrollBy({
+      left: 410, // Cuộn sang phải 300px
+      behavior: "smooth", // Cuộn mượt
+    });
+  };
+
+  const mainFood = [
+    {
+      id: 1,
+      component: <FoodCard />,
+    },
+    {
+      id: 2,
+      component: <FoodCard />,
+    },
+    {
+      id: 3,
+      component: <FoodCard />,
+    },
+    {
+      id: 4,
+      component: <FoodCard />,
+    },
+
+    {
+      id: 5,
+      component: <FoodCard />,
+    },
+  ];
   return (
     <div className="mt-[80px]">
       {/* SLIDER */}
@@ -73,29 +113,52 @@ export default function Home() {
         >
           <div className="p-4 md:p-8">
             <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-              <div className="w-[150px] h-[40px] md:w-[200px] bg-slate-400 font-semibold shadow-md flex justify-center items-center rounded-lg">
+              <div className="w-[150px] h-[40px] md:w-[200px] bg-slate-400 font-semibold text-white shadow-md flex justify-center items-center rounded-lg">
                 <p>Món phụ</p>
               </div>
-              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
+              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold text-white shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
                 <p>Món chính</p>
               </div>
-              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
+              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold text-white shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
                 <p>Thức uống</p>
               </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 mt-8">
-              <FoodCard />
-              <FoodCard />
-              <FoodCard />
-              {/* other FoodCards */}
+
+            {/* Slider container */}
+            <div className="flex justify-center relative ">
+              <div
+                className="overflow-x-hidden whitespace-nowrap flex lg:space-x-12 space-x-8 md:space-x-8 mt-8 lg:max-w-screen-xl sm:max-w-screen-sm md:max-w-screen-md lg:mx-auto md:mx-auto sm:mx-auto"
+                ref={sliderRef}
+              >
+                {mainFood.map((food) => (
+                  <div className="" key={food.id}>
+                    {food.component}
+                  </div>
+                ))}
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="absolute inset-y-0 left-0 flex items-center ">
+                <button
+                  className="bg-slate-500 text-white p-2 rounded-full"
+                  onClick={scrollLeft}
+                >
+                  <HiArrowLeftCircle className="w-10 h-10 md:w-12 md:h-12" />
+                </button>
+              </div>
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <button
+                  className="bg-slate-500 text-white p-2 rounded-full"
+                  onClick={scrollRight}
+                >
+                  <HiArrowRightCircle className="w-10 h-10 md:w-12 md:h-12" />
+                </button>
+              </div>
             </div>
           </div>
-          <div className="flex justify-center items-center gap-2 mt-6">
-            <HiArrowLeftCircle className="w-10 h-10 md:w-12 md:h-12" />
-            <HiArrowRightCircle className="w-10 h-10 md:w-12 md:h-12" />
-          </div>
+
           <div className="flex justify-center mt-4">
-            <Button className="bg-slate-400 px-3 md:px-4 rounded-md">
+            <Button href="/" className="bg-slate-400 px-3 md:px-4 rounded-md">
               Xem thêm
             </Button>
           </div>

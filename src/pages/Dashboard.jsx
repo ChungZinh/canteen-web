@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 import DashSidebar from "../components/dashboard/DashSidebar";
 import { useEffect, useState } from "react";
 import DashProduct from "../components/dashboard/DashProduct";
-import DashHome from "../components/dashboard/DashHome";
 import DashAddProduct from "../components/dashboard/DashAddProduct";
 import DashboardM from "../components/dashboard/Dashboard";
 import DashListCustomers from "../components/dashboard/DashListCustomers";
