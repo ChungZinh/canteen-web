@@ -158,7 +158,7 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center mt-4">
-            <Button href="/" className="bg-slate-400 px-3 md:px-4 rounded-md">
+            <Button href="/products" className="bg-slate-400 px-3 md:px-4 rounded-md">
               Xem thêm
             </Button>
           </div>

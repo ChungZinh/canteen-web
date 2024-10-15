@@ -11,6 +11,8 @@ import SignUp from "./pages/SignUp";
 import AdminRoute from "./components/route/AdminRoute";
 import Dashboard from "./pages/Dashboard";
 import UserRoute from "./components/route/UserRoute";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/recruitment" element={<Recruitment />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>

@@ -1,3 +1,4 @@
+import { HiOutlineShoppingCart, HiPlus } from "react-icons/hi2";
 import food from "../assets/imgs/img1.png";
 export default function FoodCard({ size, cart }) {
   return (
@@ -17,8 +18,14 @@ export default function FoodCard({ size, cart }) {
               <p className="text-center inria-sans-light-italic text-md">
                 Giá: 20.000đ
               </p>
-              <button className=" bg-primary-500 text-slate-500 border font-semibold rounded-lg p-2 mt-2">
-                Mua ngay
+              <button className=" bg-primary-500 text-slate-500 bg-slate-200 border font-semibold rounded-lg p-2 mt-2">
+                {cart ? (
+                  <div className="flex items-center">
+                    <HiPlus className="h-6 w-6" />
+                  </div>
+                ) : (
+                  "Mua ngay"
+                )}
               </button>
             </div>
           </div>

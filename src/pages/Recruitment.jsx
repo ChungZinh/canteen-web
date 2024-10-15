@@ -2,7 +2,7 @@ import bg2 from "../assets/imgs/bg4.png";
 
 export default function Recruitment() {
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       <div
         className="w-screen h-[400px] mt-[80px] flex justify-center items-center  bg-opacity-70 backdrop-blur-sm"
         style={{
@@ -13,7 +13,7 @@ export default function Recruitment() {
         }}
       >
         <h1 className="text-center text-4xl lg:text-6xl font-playwrite mb-[80px]">
-          Tuyển Dụng
+          Tuyển dụng
         </h1>
       </div>
       <div className="">

@@ -55,12 +55,12 @@ export default function Product() {
           {/* Food Cards */}
           <div className="w-full  lg:w-3/4  flex justify-center items-center ">
             <div className="w-full flex flex-col items-center justify-center md:grid lg:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-y-4">
-              <FoodCard size="small" />
-              <FoodCard size="small" />
-              <FoodCard size="small" />
-              <FoodCard size="small" />
-              <FoodCard size="small" />
-              <FoodCard size="small" />
+              <FoodCard size="small"  cart />
+              <FoodCard size="small" cart />
+              <FoodCard size="small" cart />
+              <FoodCard size="small" cart />
+              <FoodCard size="small" cart />
+              <FoodCard size="small" cart />
             </div>
           </div>
         </div>

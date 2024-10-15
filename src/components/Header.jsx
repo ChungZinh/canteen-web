@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import authApi from "../api/authApi";
 import { signOutSuccess } from "../redux/user/userSlice";
+import { TbPaperBag } from "react-icons/tb";
 
 export default function Header() {
   const cartCount = 2;
@@ -15,25 +16,25 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-    // Xác định mục active dựa trên URL hiện tại
-    const getSelectedNav = () => {
-      switch (location.pathname) {
-        case "/":
-          return "home";
-        case "/products":
-          return "products";
-        case "/about":
-          return "about";
-        case "/contact":
-          return "contact";
-        case "/recruitment":
-          return "recruitment";
-        default:
-          return "home";
-      }
-    };
-  
-    const [selected, setSelected] = useState(getSelectedNav());
+  // Xác định mục active dựa trên URL hiện tại
+  const getSelectedNav = () => {
+    switch (location.pathname) {
+      case "/":
+        return "home";
+      case "/products":
+        return "products";
+      case "/about":
+        return "about";
+      case "/contact":
+        return "contact";
+      case "/recruitment":
+        return "recruitment";
+      default:
+        return "home";
+    }
+  };
+
+  const [selected, setSelected] = useState(getSelectedNav());
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,11 +111,16 @@ export default function Header() {
                 <div className="flex md:order-2 space-x-4 items-center">
                   {/* Shopping Cart Icon with Count */}
                   <div className="relative mt-2">
-                    <button className="bg-none" size={"sm"}>
-                      <HiOutlineShoppingCart className="h-8 w-8 text-slate-500" />
-                    </button>
+                    <Button
+                      color={"none"}
+                      className="bg-none"
+                      href="/cart"
+                      size={"sm"}
+                    >
+                      <TbPaperBag className="h-8 w-8 text-slate-500" />
+                    </Button>
                     {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      <span className="absolute top-1 right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
                         {cartCount}
                       </span>
                     )}

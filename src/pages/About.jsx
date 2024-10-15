@@ -2,7 +2,7 @@ import bg2 from "../assets/imgs/bg4.png";
 
 export default function About() {
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       <div
         className="w-screen h-[400px] mt-[80px] flex justify-center items-center  bg-opacity-70 backdrop-blur-sm"
         style={{

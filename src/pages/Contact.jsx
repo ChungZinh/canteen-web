@@ -3,7 +3,7 @@ import bg2 from "../assets/imgs/bg4.png";
 
 export default function Contact() {
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       <div
         className="w-screen h-[400px] mt-[80px] flex justify-center items-center  bg-opacity-70 backdrop-blur-sm"
         style={{
@@ -14,7 +14,7 @@ export default function Contact() {
         }}
       >
         <h1 className="text-center text-4xl lg:text-6xl font-playwrite mb-[80px]">
-          Liên Hệ
+          Liên hệ
         </h1>
       </div>
 
