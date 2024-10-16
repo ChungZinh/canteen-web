@@ -1,4 +1,3 @@
-import { a } from "framer-motion/client";
 import axiosClient from "./axiosClient";
 
 const foodApi = {
@@ -40,6 +39,16 @@ const foodApi = {
   available(id, currentUser, accessToken) {
     const url = `/foods/available/${id}`;
     return axiosClient.delete(url, null, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  getFood(id, currentUser, accessToken) {
+    const url = `/foods/${id}`;
+    return axiosClient.get(url, {
       headers: {
         "x-client-id": currentUser?._id,
         Authorization: `Bearer ${accessToken}`,

@@ -6,6 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 import { GoDot } from "react-icons/go";
 import { BsFillPersonBadgeFill } from "react-icons/bs";
 import { MdReviews } from "react-icons/md";
+import { BiSolidDiscount } from "react-icons/bi";
 
 export default function DashSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -64,7 +65,6 @@ export default function DashSidebar() {
           } `}
         >
           <Sidebar.ItemGroup className="">
-
             {/* DASHBOARD */}
             <Sidebar.Item active={tab === "dashboard"}>
               {isCollapsed ? (
@@ -120,9 +120,9 @@ export default function DashSidebar() {
 
             {/* ORDERS */}
             {isCollapsed ? (
-              <Sidebar.Item active={tab === "orders"}>
+              <Sidebar.Item active={tab === "listOrders"}>
                 <div className=" p-5">
-                  <Link to={"/dashboard?tab=orders"}>
+                  <Link to={"/dashboard?tab=listOrders"}>
                     <HiArchive size={35} />
                   </Link>
                 </div>
@@ -152,9 +152,9 @@ export default function DashSidebar() {
 
             {/* CUSTOMER */}
             {isCollapsed ? (
-              <Sidebar.Item active={tab === "customers"}>
+              <Sidebar.Item active={tab === "listCustomers"}>
                 <div className=" p-5">
-                  <Link to={"/dashboard?tab=customers"}>
+                  <Link to={"/dashboard?tab=listCustomers"}>
                     <BsFillPersonBadgeFill size={35} />
                   </Link>
                 </div>
@@ -181,6 +181,42 @@ export default function DashSidebar() {
                   >
                     <GoDot />
                     <span className="ml-2 ">Details</span>
+                  </Link>
+                </Sidebar.Item>
+              </Sidebar.Collapse>
+            )}
+
+            {/* DISCOUNT */}
+            {isCollapsed ? (
+              <Sidebar.Item active={tab === "listDiscounts"}>
+                <div className=" p-5">
+                  <Link to={"/dashboard?tab=listDiscounts"}>
+                    <BiSolidDiscount size={35} />
+                  </Link>
+                </div>
+              </Sidebar.Item>
+            ) : (
+              <Sidebar.Collapse
+                icon={BiSolidDiscount}
+                className="p-6"
+                label="Discounts"
+              >
+                <Sidebar.Item active={tab === "listDiscounts"}>
+                  <Link
+                    to={"/dashboard?tab=listDiscounts"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">List</span>
+                  </Link>
+                </Sidebar.Item>
+                <Sidebar.Item active={tab === "addDiscount"}>
+                  <Link
+                    to={"/dashboard?tab=addDiscount"}
+                    className="flex gap-0 items-center"
+                  >
+                    <GoDot />
+                    <span className="ml-2 ">Add</span>
                   </Link>
                 </Sidebar.Item>
               </Sidebar.Collapse>
