@@ -1,8 +1,8 @@
 import axiosClient from "./axiosClient";
 
 const foodApi = {
-  getAllFoods() {
-    const url = "/foods";
+  getAllFoods(query) {
+    const url = `/foods${query}`;
     return axiosClient.get(url);
   },
 

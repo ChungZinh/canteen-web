@@ -1,10 +1,11 @@
-import { Button, Spinner, Table } from "flowbite-react";
+import { Button, Pagination, Spinner, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { HiPlus } from "react-icons/hi";
 import foodApi from "../../api/foodApi";
 import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { buildQueryString } from "../../utils/buildQueryString";
 
 export default function DashProduct() {
   const [products, setProducts] = useState([]);
@@ -12,24 +13,35 @@ export default function DashProduct() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [isUpdate, setIsUpdate] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const onPageChange = (pageN) => {
+    if (pageN < 1 || pageN > totalPages) return;
+    setCurrentPage(pageN);
+    setQuery((prev) => ({ ...prev, page: pageN }));
+  };
 
   // Dish dummy data
   useEffect(() => {
     // Fetch
     setLoading(true);
     const fetchFoods = async () => {
-      const response = await foodApi.getAllFoods();
+      const queryB = buildQueryString(query);
+      const response = await foodApi.getAllFoods(queryB);
       if (response.data) {
         setProducts(response.data.foods);
         setLoading(false);
         console.log(response.data.foods);
+        setTotalPages(response.data.totalPages);
       } else {
         toast.error("Failed to fetch foods");
         setLoading(false);
       }
     };
     fetchFoods();
-  }, [currentUser?._id, isUpdate]);
+  }, [currentUser?._id, isUpdate, query]);
 
   const handleSetSoldOut = async (id) => {
     const accessToken = localStorage.getItem("accessToken");
@@ -138,6 +150,13 @@ export default function DashProduct() {
                 ))}
               </Table.Body>
             </Table>
+            <div className="">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </div>
           </div>
         )}
       </>
