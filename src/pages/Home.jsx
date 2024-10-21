@@ -4,8 +4,98 @@ import { GiForkKnifeSpoon } from "react-icons/gi";
 import bg from "../assets/imgs/bg1.jpg";
 import FoodCard from "../components/FoodCard";
 import { HiArrowLeftCircle, HiArrowRightCircle } from "react-icons/hi2";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { buildQueryString } from "../utils/buildQueryString";
+import foodApi from "../api/foodApi";
+import { toast } from "react-toastify";
+import slide from "../assets/imgs/slides/slide1.jpg";
+import slide1 from "../assets/imgs/slides/slide2.jpg";
+import slide2 from "../assets/imgs/slides/slide1.jpg";
+import slide3 from "../assets/imgs/slides/slide2.jpg";
+import {
+  FOOD_BREAKFAST,
+  FOOD_DESSERT,
+  FOOD_DINNER,
+  FOOD_DRINK,
+  FOOD_LUNCH,
+} from "../constants/categories";
 export default function Home() {
+  const [query, setQuery] = useState({ all: true });
+  const { currentUser } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [categories, setCategories] = useState([
+    "Món chính",
+    "Món phụ",
+    "Thức uống",
+  ]);
+
+  const [foodMain, setFoodMain] = useState([]);
+  const [foodSide, setFoodSide] = useState([]);
+  const [foodDrink, setFoodDrink] = useState([]);
+
+  const [selectCategory, setSelectCategory] = useState("Món chính");
+
+  // Dish dummy data
+  useEffect(() => {
+    // Fetch
+    setLoading(true);
+    const fetchFoods = async () => {
+      const queryB = buildQueryString(query);
+      const response = await foodApi.getAllFoods(queryB);
+      if (response.data) {
+        setProducts(response.data.foods);
+        setLoading(false);
+
+        const foods = response.data.foods;
+
+        // Khởi tạo các danh sách rỗng
+        const mainDishes = [];
+        const sideDishes = [];
+        const drinks = [];
+
+        // Duyệt qua các sản phẩm và phân loại dựa trên category
+        foods.forEach((food) => {
+          if (
+            food.category.name === FOOD_BREAKFAST ||
+            food.category.name === FOOD_LUNCH ||
+            food.category.name === FOOD_DINNER
+          ) {
+            mainDishes.push(food);
+          } else if (food.category.name === FOOD_DESSERT) {
+            sideDishes.push(food);
+          } else if (food.category.name === FOOD_DRINK) {
+            drinks.push(food);
+          }
+        });
+
+        // Cập nhật state với dữ liệu đã phân loại
+        setFoodMain(mainDishes);
+        setFoodSide(sideDishes);
+        setFoodDrink(drinks);
+      } else {
+        toast.error("Failed to fetch foods");
+        setLoading(false);
+      }
+    };
+
+    const fetchFoodsTop = async () => {
+      const response = await foodApi.getTop10SellingProducts();
+      if (response.data) {
+        setTopProducts(response.data);
+        setLoading(false);
+      } else {
+        toast.error("Failed to fetch foods");
+        setLoading(false);
+      }
+    };
+
+    fetchFoodsTop();
+    fetchFoods();
+  }, [currentUser?._id, query]);
+
   const sliderRef = useRef(null);
 
   const scrollLeft = () => {
@@ -22,56 +112,16 @@ export default function Home() {
     });
   };
 
-  const mainFood = [
-    {
-      id: 1,
-      component: <FoodCard />,
-    },
-    {
-      id: 2,
-      component: <FoodCard />,
-    },
-    {
-      id: 3,
-      component: <FoodCard />,
-    },
-    {
-      id: 4,
-      component: <FoodCard />,
-    },
-
-    {
-      id: 5,
-      component: <FoodCard />,
-    },
-  ];
   return (
     <div className="mt-[80px]">
       {/* SLIDER */}
 
-      <div className="w-full h-[300px] md:h-[600px]">
+      <div className="w-full h-[300px] md:h-[600px] ">
         <Carousel leftControl=" " rightControl=" ">
-          <img
-            src="https://flowbite.com/docs/images/carousel/carousel-1.svg"
-            alt="..."
-            className="rounded-none"
-          />
-          <img
-            src="https://flowbite.com/docs/images/carousel/carousel-2.svg"
-            alt="..."
-          />
-          <img
-            src="https://flowbite.com/docs/images/carousel/carousel-3.svg"
-            alt="..."
-          />
-          <img
-            src="https://flowbite.com/docs/images/carousel/carousel-4.svg"
-            alt="..."
-          />
-          <img
-            src="https://flowbite.com/docs/images/carousel/carousel-5.svg"
-            alt="..."
-          />
+          <img src={slide} alt="..." />
+          <img src={slide1} alt="..." />
+          <img src={slide2} alt="..." />
+          <img src={slide3} alt="..." />
         </Carousel>
       </div>
 
@@ -112,16 +162,23 @@ export default function Home() {
           style={{ backgroundImage: `url(${bg})` }}
         >
           <div className="p-4 md:p-8">
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-              <div className="w-[150px] h-[40px] md:w-[200px] bg-slate-400 font-semibold text-white shadow-md flex justify-center items-center rounded-lg">
-                <p>Món phụ</p>
-              </div>
-              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold text-white shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
-                <p>Món chính</p>
-              </div>
-              <div className="w-[200px] h-[40px] bg-slate-400 font-semibold text-white shadow-md shadow-neutral-400 flex justify-center items-center rounded-lg">
-                <p>Thức uống</p>
-              </div>
+            <div className={`flex flex-wrap justify-center gap-4 md:gap-8`}>
+              {categories.map((category) => (
+                <>
+                  <button
+                    onClick={() => setSelectCategory(category)}
+                    className={`w-[150px] h-[40px] md:w-[200px] bg-slate-400 font-semibold text-white shadow-md flex justify-center items-center duration-300 rounded-lg 
+                    ${
+                      selectCategory === category
+                        ? "bg-slate-500"
+                        : "hover:bg-slate-500"
+                    }
+                      `}
+                  >
+                    <p>{category}</p>
+                  </button>
+                </>
+              ))}
             </div>
 
             {/* Slider container */}
@@ -130,11 +187,43 @@ export default function Home() {
                 className="overflow-x-hidden whitespace-nowrap flex lg:space-x-12 space-x-8 md:space-x-8 mt-8 lg:max-w-screen-xl sm:max-w-screen-sm md:max-w-screen-md lg:mx-auto md:mx-auto sm:mx-auto"
                 ref={sliderRef}
               >
-                {mainFood.map((food) => (
-                  <div className="" key={food.id}>
-                    {food.component}
-                  </div>
-                ))}
+                {
+                  {
+                    "Món chính": (
+                      <>
+                        {foodMain.map((food) => (
+                          <FoodCard
+                            key={food._id}
+                            product={food}
+                            size={"large"}
+                          />
+                        ))}
+                      </>
+                    ),
+                    "Món phụ": (
+                      <>
+                        {foodSide.map((food) => (
+                          <FoodCard
+                            key={food._id}
+                            product={food}
+                            size={"large"}
+                          />
+                        ))}
+                      </>
+                    ),
+                    "Thức uống": (
+                      <>
+                        {foodDrink.map((food) => (
+                          <FoodCard
+                            key={food._id}
+                            product={food}
+                            size={"large"}
+                          />
+                        ))}
+                      </>
+                    ),
+                  }[selectCategory]
+                }
               </div>
 
               {/* Navigation buttons */}
@@ -158,7 +247,10 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center mt-4">
-            <Button href="/products" className="bg-slate-400 px-3 md:px-4 rounded-md">
+            <Button
+              href="/products"
+              className="bg-slate-400 px-3 md:px-4 rounded-md"
+            >
               Xem thêm
             </Button>
           </div>
@@ -172,14 +264,9 @@ export default function Home() {
         </h1>
         <div className="max-w-screen-xl mx-auto flex justify-center items-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 mt-[50px]">
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
-            <FoodCard size="small" />
+            {topProducts.map((product) => (
+              <FoodCard key={product._id} product={product} size={"small"} />
+            ))}
           </div>
         </div>
       </div>

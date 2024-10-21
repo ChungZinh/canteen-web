@@ -6,6 +6,12 @@ const foodApi = {
     return axiosClient.get(url);
   },
 
+  getTop10SellingProducts() {
+    const url = "/foods/top-selling";
+    return axiosClient.get(url);
+  },
+
+
   create(data, currentUser, accessToken) {
     const url = "/foods";
     return axiosClient.post(url, data, {
