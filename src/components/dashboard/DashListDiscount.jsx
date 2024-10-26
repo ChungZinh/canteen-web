@@ -4,14 +4,17 @@ import discountApi from "../../api/discountApi";
 import { useSelector } from "react-redux";
 import { formatDate } from "../../utils/formatDate";
 import { MdMoreVert } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { LuEye } from "react-icons/lu";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
+import { toast } from "react-toastify";
 
 export default function DashListDiscount() {
   const [discounts, setDiscounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdate, setIsUpdate] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const accessToken = localStorage.getItem("accessToken");
   useEffect(() => {
     const fetchDiscounts = async () => {
@@ -26,7 +29,21 @@ export default function DashListDiscount() {
       }
     };
     fetchDiscounts();
-  }, [currentUser, accessToken]);
+  }, [currentUser, accessToken, isUpdate]);
+
+  const handleDeleteDiscount = async (discountId) => {
+    try {
+      const response = await discountApi.delete(
+        discountId,
+        currentUser,
+        accessToken
+      );
+      toast.success(response.message);
+      setIsUpdate(!isUpdate);
+    } catch (error) {
+      console.log("Failed to delete discount: ", error);
+    }
+  };
 
   return (
     <div className="h-screen w-full bg-slate-200 p-6 overflow-y-scroll">
@@ -101,15 +118,22 @@ export default function DashListDiscount() {
                       }
                     >
                       <Dropdown.Item>
-                        <Link to={`/dashboard?tab=editOrder`}>
-                          <div className="flex items-center">
-                            <LuEye size={20} />
-                            <span className="ml-2">Edit</span>
-                          </div>
-                        </Link>
+                        <div
+                          onClick={() => {
+                            navigate(`/dashboard?tab=editDiscount`, {
+                              state: { discount },
+                            });
+                          }}
+                        className="flex items-center">
+                          <LuEye size={20} />
+                          <span className="ml-2">Edit</span>
+                        </div>
                       </Dropdown.Item>
                       <Dropdown.Item>
-                        <div className="flex items-center">
+                        <div
+                          onClick={() => handleDeleteDiscount(discount._id)}
+                          className="flex items-center"
+                        >
                           <IoIosRemoveCircleOutline size={20} />
                           <span className="ml-2">Delete</span>
                         </div>

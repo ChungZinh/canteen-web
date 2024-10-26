@@ -13,6 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import UserRoute from "./components/route/UserRoute";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Profile from "./pages/Profile";
+import { ToastContainer } from "react-toastify";
+import CheckoutStep2 from "./pages/CheckoutStep2";
 
 function App() {
   return (
@@ -31,11 +34,25 @@ function App() {
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout-step-2" element={<CheckoutStep2 />} />
+          <Route path="/profile" element={<Profile />} />
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         <FooterC />
       </BrowserRouter>
     </>

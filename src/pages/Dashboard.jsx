@@ -36,6 +36,7 @@ export default function Dashboard() {
       {tab === "detailOrders" && <DashDetailOrder />}
       {tab === "listDiscounts" && <DashListDiscount />}
       {tab === "addDiscount" && <DashAddDiscount />}
+      {tab === "editDiscount" && <DashAddDiscount />}
     </div>
   );
 }

@@ -1,22 +1,31 @@
-import { Button, Datepicker, Label, Table, Textarea, TextInput } from "flowbite-react";
-import { useRef, useState } from "react";
+import {
+  Button,
+  Datepicker,
+  Label,
+  Table,
+  Textarea,
+  TextInput,
+} from "flowbite-react";
+import { useEffect, useRef, useState } from "react";
 import { HiSave } from "react-icons/hi";
 import { formatDate } from "../../utils/formatDate";
-import { s } from "framer-motion/client";
 import foodApi from "../../api/foodApi";
 import { useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import discountApi from "../../api/discountApi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function DashAddDiscount() {
-  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [applicableProducts, setApplicableProducts] = useState([]); // State for products
   const [currentProductCode, setCurrentProductCode] = useState(""); // For input
   const { currentUser } = useSelector((state) => state.user);
   const accessToken = localStorage.getItem("accessToken");
   const navigate = useNavigate();
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const tabFromUrl = urlParams.get("tab");
+  const { discount } = location.state || {};
   const [selectedStartDate, setSelectedStartDate] = useState(
     formatDate(Date.now())
   );
@@ -25,19 +34,43 @@ export default function DashAddDiscount() {
   );
   const btnRef = useRef();
 
+  // set formData when editing
+  useEffect(() => {
+    if (discount) {
+      setFormData({
+        code: discount.code,
+        discountPercentage: discount.discountPercentage,
+        minOrderValue: discount.minOrderValue,
+        description: discount.description,
+      });
+      setSelectedStartDate(discount.startDate);
+      setSelectedEndDate(discount.endDate);
+      // Initialize applicableProducts from discount
+      if (discount.applicableProducts) {
+        setApplicableProducts(
+          discount.applicableProducts.map((productCode) => ({
+            code: productCode, // Assuming product code is the only detail you have here
+          }))
+        );
+      }
+    }
+  }, [discount]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleChangeStartDate = (date) => {
-    setSelectedStartDate(date ? formatDate(date) : Date.now());
-    setFormData((prev) => ({ ...prev, startDate: selectedStartDate }));
+    const newStartDate = date ? formatDate(date) : Date.now();
+    setSelectedStartDate(newStartDate);
+    setFormData((prev) => ({ ...prev, startDate: newStartDate }));
   };
 
   const handleChangeEndDate = (date) => {
-    setSelectedEndDate(date ? formatDate(date) : Date.now());
-    setFormData((prev) => ({ ...prev, endDate: selectedEndDate }));
+    const newEndDate = date ? formatDate(date) : Date.now();
+    setSelectedEndDate(newEndDate);
+    setFormData((prev) => ({ ...prev, endDate: newEndDate }));
   };
 
   const handleAddProduct = async () => {
@@ -77,6 +110,8 @@ export default function DashAddDiscount() {
     }
   };
 
+  console.log("applicableProducts", applicableProducts);
+
   const handleRemoveProduct = (productCode) => {
     setApplicableProducts((prev) =>
       prev.filter((product) => product.code !== productCode)
@@ -103,13 +138,43 @@ export default function DashAddDiscount() {
     }
   };
 
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await discountApi.update(
+        discount._id,
+        formData,
+        currentUser,
+        accessToken
+      );
+      if (response.data) {
+        toast.success(response.data.message);
+        navigate("/dashboard?tab=listDiscounts");
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
   return (
     <div className="h-screen w-full bg-slate-200 p-6 overflow-y-scroll">
       <div className="">
         <div className="flex items-center justify-between">
           <div className="">
-            <h1 className="text-3xl font-semibold ">Thêm giảm giá</h1>
-            <p className="text-slate-500">Thêm giảm giá mới</p>
+            <h1 className="text-3xl font-semibold ">
+              {tabFromUrl === "addDiscount"
+                ? "Thêm giảm giá"
+                : "Cập nhật giảm giá"}
+            </h1>
+            <p className="text-slate-500">
+              {" "}
+              {tabFromUrl === "addDiscount"
+                ? "Thêm giảm giá"
+                : "Cập nhật giảm giá"}
+            </p>
           </div>
           <div className="">
             <Button
@@ -119,14 +184,16 @@ export default function DashAddDiscount() {
             >
               <HiSave size={20} />
               <span className="ml-2">
-                {isEditing ? "Cập nhật" : "Lưu"} giảm giá
+                {tabFromUrl === "addDiscount" ? "Lưu" : "Cập nhật"} giảm giá
               </span>
             </Button>
           </div>
         </div>
       </div>
       <div className="mt-8 bg-white p-4 rounded-md shadow-md">
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={tabFromUrl === "addDiscount" ? handleSubmit : handleUpdate}
+        >
           <div className="space-y-2">
             <Label className="mt-4">Mã giảm giá</Label>
             <TextInput
@@ -153,7 +220,7 @@ export default function DashAddDiscount() {
               <Label className="mt-4">Ngày bắt đầu</Label>
               <Datepicker
                 name="startDate"
-                onSelectedDateChanged={handleChangeStartDate}
+                onSelectedDateChanged={(date) => handleChangeStartDate(date)}
                 value={selectedStartDate}
               />
             </div>
@@ -161,7 +228,7 @@ export default function DashAddDiscount() {
               <Label className="mt-4">Ngày kết thúc</Label>
               <Datepicker
                 name="endDate"
-                onSelectedDateChanged={handleChangeEndDate}
+                onSelectedDateChanged={(date) => handleChangeEndDate(date)}
                 value={selectedEndDate}
               />
             </div>

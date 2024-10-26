@@ -9,11 +9,11 @@ import { signOutSuccess } from "../redux/user/userSlice";
 import { TbPaperBag } from "react-icons/tb";
 
 export default function Header() {
-  const cartCount = 2;
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const location = useLocation();
   const { currentUser } = useSelector((state) => state.user);
+  const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   // Xác định mục active dựa trên URL hiện tại
@@ -119,9 +119,9 @@ export default function Header() {
                     >
                       <TbPaperBag className="h-8 w-8 text-slate-500" />
                     </Button>
-                    {cartCount > 0 && (
+                    {cart.length > 0 && (
                       <span className="absolute top-1 right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                        {cartCount}
+                        {cart.length}
                       </span>
                     )}
                   </div>
@@ -135,8 +135,9 @@ export default function Header() {
                         label={
                           <Avatar
                             alt="User settings"
-                            img={currentUser?.photoURL}
+                            img={currentUser?.avatar}
                             rounded
+                            className="border rounded-full"
                           />
                         }
                       >
@@ -148,9 +149,13 @@ export default function Header() {
                             {currentUser?.email}
                           </span>
                         </Dropdown.Header>
-                        {/* <Dropdown.Item>Dashboard</Dropdown.Item>
-                    <Dropdown.Item>Settings</Dropdown.Item>
-                    <Dropdown.Item>Earnings</Dropdown.Item> */}
+                        {currentUser?.role?.name === "admin" && (
+                          <Dropdown.Item href="/dashboard?tab=dashboard">
+                            Dashboard
+                          </Dropdown.Item>
+                        )}
+                        <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                        <Dropdown.Item>Settings</Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item onClick={handleSignOut}>
                           Sign out
