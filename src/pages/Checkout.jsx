@@ -12,7 +12,7 @@ export default function Checkout() {
   const location = useLocation();
   const urlParams = new URLSearchParams(location.search);
   const tabFromUrl = urlParams.get("step");
-  const { cart, totalItems, totalPrice } = location.state || {};
+  const { cart, totalItems, totalPrice, note } = location.state || {};
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -137,6 +137,7 @@ export default function Checkout() {
                             finalTotal,
                             discountAmount,
                             totalPrice,
+                            note,
                           },
                         });
                       }}

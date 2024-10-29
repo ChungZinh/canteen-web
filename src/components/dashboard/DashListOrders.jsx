@@ -1,166 +1,61 @@
-import { Button, Dropdown, Select, Table, TextInput } from "flowbite-react";
-import React, { useState } from "react";
+import {
+  Button,
+  Dropdown,
+  Pagination,
+  Select,
+  Table,
+  TextInput,
+} from "flowbite-react";
+import React, { useEffect, useState } from "react";
 import { BiExport } from "react-icons/bi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { LuEye } from "react-icons/lu";
 import { MdMoreVert } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { buildQueryString } from "../../utils/buildQueryString";
+import orderApi from "../../api/orderApi";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { formatCreatedAt } from "../../utils/formatDate";
+import { nav } from "framer-motion/client";
 
 export default function DashListOrders() {
+  const { currentUser } = useSelector((state) => state.user);
+  const accessToken = localStorage.getItem("accessToken");
   const [page, setPage] = useState(1);
-  const [query, setQuery] = useState({ page: 1, limit: 10 });
+  const [query, setQuery] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(10);
-  const handlePageChange = (pageNumber) => {
-    if (pageNumber > 0 && pageNumber <= totalPages) {
-      setPage(pageNumber);
-      setQuery((prevQuery) => ({
-        ...prevQuery,
-        page: pageNumber,
-      }));
-    }
+  const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
+  const onPageChange = (pageN) => {
+    if (pageN < 1 || pageN > totalPages) return;
+    setCurrentPage(pageN);
+    setQuery((prev) => ({ ...prev, page: pageN }));
   };
-  const ordersData = [
-    {
-      id: 1,
-      orderId: "123456",
-      date: "2021-09-20",
-      customer: {
-        name: "John Doe",
-        phone: "1234567890",
-        email: "johndoe@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/8.png",
-      },
-      status: "Pending",
-      method: "Cash",
-    },
-    {
-      id: 2,
-      orderId: "123457",
-      date: "2021-09-21",
-      customer: {
-        name: "Jane Doe",
-        phone: "1234567890",
-        email: "janedone@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/7.png",
-      },
-      status: "Delivered",
-      method: "Card",
-    },
-    {
-      id: 3,
-      orderId: "123458",
-      date: "2021-09-22",
-      customer: {
-        name: "Michael Smith",
-        phone: "9876543210",
-        email: "michaelsmith@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/6.png",
-      },
-      status: "Shipped",
-      method: "Cash",
-    },
-    {
-      id: 4,
-      orderId: "123459",
-      date: "2021-09-23",
-      customer: {
-        name: "Sarah Brown",
-        phone: "1231231234",
-        email: "sarahbrown@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/5.png",
-      },
-      status: "Cancelled",
-      method: "Card",
-    },
-    {
-      id: 5,
-      orderId: "123460",
-      date: "2021-09-24",
-      customer: {
-        name: "David Johnson",
-        phone: "5555555555",
-        email: "davidjohnson@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/4.png",
-      },
-      status: "Pending",
-      method: "Cash",
-    },
-    {
-      id: 6,
-      orderId: "123461",
-      date: "2021-09-25",
-      customer: {
-        name: "Emma Wilson",
-        phone: "9999999999",
-        email: "emmawilson@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/3.png",
-      },
-      status: "Delivered",
-      method: "Card",
-    },
-    {
-      id: 7,
-      orderId: "123462",
-      date: "2021-09-26",
-      customer: {
-        name: "Olivia Davis",
-        phone: "8888888888",
-        email: "oliviadavis@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/2.png",
-      },
-      status: "Shipped",
-      method: "Cash",
-    },
-    {
-      id: 8,
-      orderId: "123463",
-      date: "2021-09-27",
-      customer: {
-        name: "James Miller",
-        phone: "7777777777",
-        email: "jamesmiller@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/1.png",
-      },
-      status: "Delivered",
-      method: "Card",
-    },
-    {
-      id: 9,
-      orderId: "123464",
-      date: "2021-09-28",
-      customer: {
-        name: "Isabella Garcia",
-        phone: "6666666666",
-        email: "isabellagarcia@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/1.png",
-      },
-      status: "Pending",
-      method: "Cash",
-    },
-    {
-      id: 10,
-      orderId: "123465",
-      date: "2021-09-29",
-      customer: {
-        name: "Alexander Martinez",
-        phone: "5551234567",
-        email: "alexandermartinez@gmail.com",
-        avatar:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/3.png",
-      },
-      status: "Shipped",
-      method: "Card",
-    },
-  ];
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchOrders = async () => {
+      const queryB = buildQueryString(query);
+      const response = await orderApi.getAll(queryB, currentUser, accessToken);
+      if (response.data) {
+        setOrders(response.data.orders);
+        setLoading(false);
+        setTotalPages(response.data.totalPages);
+      } else {
+        toast.error("Failed to fetch orders");
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [currentUser?._id, query]);
+
+  const handleDetail = (order) => {
+    navigate(`/dashboard?tab=detailOrders`, { state: { order } });
+  };
 
   return (
     <div className="h-screen w-full bg-slate-200 p-4 overflow-y-scroll">
@@ -185,36 +80,39 @@ export default function DashListOrders() {
         </div>
         <Table striped>
           <Table.Head>
-            <Table.HeadCell>Order ID</Table.HeadCell>
-            <Table.HeadCell>Date</Table.HeadCell>
             <Table.HeadCell>Customer</Table.HeadCell>
+            <Table.HeadCell>Date</Table.HeadCell>
+            <Table.HeadCell>Amount</Table.HeadCell>
             <Table.HeadCell>Status</Table.HeadCell>
             <Table.HeadCell>Method</Table.HeadCell>
             <Table.HeadCell>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {ordersData.map((order) => (
-              <Table.Row key={order.id}>
-                <Table.Cell>{order.orderId}</Table.Cell>
-                <Table.Cell>{order.date}</Table.Cell>
+            {orders.map((order) => (
+              <Table.Row key={order._id}>
                 <Table.Cell>
                   <div className="flex items-center">
                     <img
-                      src={order.customer.avatar}
+                      src={order.user.avatar}
                       alt="avatar"
-                      className="h-8 w-8 rounded-full"
+                      className="h-10 w-10 rounded-full border"
                     />
-                    <div className="ml-2">
-                      <p className="font-semibold">{order.customer.name}</p>
-                      <p className="text-slate-500">{order.customer.email}</p>
+                    <div className="ml-2 space-y-1">
+                      <p className="font-semibold">{order.user.fullName}</p>
+                      <p className="text-slate-500 text-xs">
+                        {order.user.email}
+                      </p>
                     </div>
                   </div>
                 </Table.Cell>
+                <Table.Cell>{formatCreatedAt(order.createdAt)}</Table.Cell>
+                <Table.Cell>{order.amount.toLocaleString()} VND</Table.Cell>
+
                 <Table.Cell>
                   <span
                     className={`${
-                      order.status === "Delivered" ||
-                      order.status === "Completed"
+                      order.status === "Đã đặt" ||
+                      order.status === "Đã thanh toán"
                         ? "bg-lime-100 text-lime-600"
                         : "bg-red-100 text-red-600"
                     } p-1 rounded-md`}
@@ -222,7 +120,7 @@ export default function DashListOrders() {
                     {order.status}
                   </span>
                 </Table.Cell>
-                <Table.Cell>{order.method}</Table.Cell>
+                <Table.Cell>{order.payMethod}</Table.Cell>
                 <Table.Cell>
                   <Dropdown
                     arrowIcon={false}
@@ -230,12 +128,13 @@ export default function DashListOrders() {
                     label={<MdMoreVert size={20} className="text-slate-500" />}
                   >
                     <Dropdown.Item>
-                      <Link to={`/dashboard?tab=editOrder`}>
-                        <div className="flex items-center">
-                          <LuEye size={20} />
-                          <span className="ml-2">View</span>
-                        </div>
-                      </Link>
+                      <div
+                        onClick={() => handleDetail(order)}
+                        className="flex items-center"
+                      >
+                        <LuEye size={20} />
+                        <span className="ml-2">View</span>
+                      </div>
                     </Dropdown.Item>
                     <Dropdown.Item>
                       <div className="flex items-center">
@@ -252,45 +151,12 @@ export default function DashListOrders() {
         {/* PAGINATION */}
       </div>
       <div className=" p-2 flex justify-between">
-        <div className="flex items-center gap-2">
-          <span>Rows per page:</span>
-          <Select className="w-[80px] h-[40px]">
-            <option>10</option>
-            <option>20</option>
-            <option>30</option>
-          </Select>
-        </div>
-
-        <div className="flex items-center justify-end gap-2">
-          <div className="flex items-center gap-2">
-            <Button
-              size={"xs"}
-              color={"#475569"}
-              disabled={page === 1}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              Previous
-            </Button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <Button
-                key={index + 1}
-                size={"xs"}
-                color={"#475569"}
-                onClick={() => handlePageChange(index + 1)}
-                className={page === index + 1 ? "bg-slate-600 text-white" : ""}
-              >
-                {index + 1}
-              </Button>
-            ))}
-            <Button
-              size={"xs"}
-              color={"#475569"}
-              disabled={page === totalPages}
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Next
-            </Button>
-          </div>
+        <div className="">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         </div>
       </div>
     </div>

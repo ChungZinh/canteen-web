@@ -33,7 +33,6 @@ export default function DashProduct() {
       if (response.data) {
         setProducts(response.data.foods);
         setLoading(false);
-        console.log(response.data.foods);
         setTotalPages(response.data.totalPages);
       } else {
         toast.error("Failed to fetch foods");

@@ -49,6 +49,7 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.cart = [];
     },
+
     // Bạn có thể thêm các reducer khác như updateQuantity hoặc handleError nếu cần
   },
 });

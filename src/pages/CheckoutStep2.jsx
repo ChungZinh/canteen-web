@@ -1,45 +1,55 @@
 import React, { useState } from "react";
 import bg2 from "../assets/imgs/bg4.png";
-import { Button, Spinner, TextInput } from "flowbite-react";
-import { useSelector } from "react-redux";
+import { Button, TextInput } from "flowbite-react";
+import { useDispatch, useSelector } from "react-redux";
 import { HiArrowLeft } from "react-icons/hi2";
 import ProductCart from "../components/ProductCart";
 import { useLocation, useNavigate } from "react-router-dom";
-import discountApi from "../api/discountApi";
 import { toast } from "react-toastify";
+import orderApi from "../api/orderApi";
+import { clearCart } from "../redux/cart/cartSlice";
 
 export default function Checkout() {
   const location = useLocation();
-  const { cart, finalTotal, discountAmount, totalPrice } = location.state || {};
+  const { cart, finalTotal, discountAmount, totalPrice, note } =
+    location.state || {};
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const accessToken = localStorage.getItem("accessToken");
-  const [loading, setLoading] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
-  const [discountAmount2, setDiscountAmount2] = useState(0);
-  const [finalTotal2, setFinalTotal2] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("ZaloPay"); // Default payment method
 
-  const handleApplyDiscount = async () => {
+  const handleCheckout = async () => {
     try {
-      setLoading(true);
-      const response = await discountApi.use(
-        {
-          code: discountCode,
-          cartItems: cart,
-        },
+      const orderData = {
+        userId: currentUser?._id,
+        foods: cart,
+        amount: finalTotal || totalPrice,
+        paymentMethod,
+        note,
+      };
+      const response = await orderApi.create(
+        orderData,
         currentUser,
         accessToken
       );
-      if (response.data) {
-        setDiscountAmount2(response.data.discountAmount);
-        setFinalTotal2(response.data.finalTotal);
-        toast.success(response.message);
+
+      console.log("Order response", response);
+
+      if (response.data && response.data.orderUrl) {
+        dispatch(clearCart());
+        // Navigate to the orderUrl
+        window.location.replace(response.data.orderUrl);
+      } else {
+        // Handle the case where orderUrl is not present
+        toast.error(
+          "Đã tạo đơn hàng, nhưng không tìm thấy liên kết thanh toán!"
+        );
       }
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi áp dụng mã giảm giá!");
-    } finally {
-      setLoading(false);
+      console.log(error);
+      toast.error("Có lỗi xảy ra khi tạo đơn hàng!");
     }
   };
 
@@ -67,15 +77,21 @@ export default function Checkout() {
                 id="zalo"
                 label="Thanh toán qua ZaloPay"
                 imageUrl="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay.png"
+                isSelected={paymentMethod === "ZaloPay"}
+                onSelect={() => setPaymentMethod("ZaloPay")}
               />
               <PaymentOption
                 id="momo"
                 label="Thanh toán qua MoMo"
                 imageUrl="https://imgs.search.brave.com/KY5s3Gb9IFeHJMoLPyU9n4F_7RNzno1vVHNbgTBN1MY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9kZXZl/bG9wZXJzLm1vbW8u/dm4vdjMvYXNzZXRz/L2ltYWdlcy9wcmlt/YXJ5LW1vbW8tZGRk/NjYyYjA5ZTk0ZDg1/ZmFjNjllMjQ0MzFm/ODczNjUucG5n"
+                isSelected={paymentMethod === "MoMo"}
+                onSelect={() => setPaymentMethod("MoMo")}
               />
               <PaymentOption
                 id="visa"
                 label="Thanh toán bằng thẻ tài khoản sinh viên"
+                isSelected={paymentMethod === "Ví Sinh Viên"}
+                onSelect={() => setPaymentMethod("Ví Sinh Viên")}
               />
             </div>
             <div className="flex justify-between items-center mt-4">
@@ -85,7 +101,9 @@ export default function Checkout() {
                   <span>Giỏ hàng</span>
                 </div>
               </Button>
-              <Button className="bg-slate-500">Hoàn tất đơn hàng</Button>
+              <Button className="bg-slate-500" onClick={handleCheckout}>
+                Hoàn tất đơn hàng
+              </Button>
             </div>
           </div>
 
@@ -107,19 +125,8 @@ export default function Checkout() {
                   onChange={(e) => setDiscountCode(e.target.value)}
                 />
               </div>
-              <Button
-                onClick={handleApplyDiscount}
-                className="w-1/5 bg-slate-500"
-                disabled={true}
-              >
-                {loading ? (
-                  <div className="flex items-center">
-                    <Spinner className="mr-2" />
-                    Đang áp dụng
-                  </div>
-                ) : (
-                  "Áp dụng"
-                )}
+              <Button className="w-1/5 bg-slate-500" disabled={true}>
+                Áp dụng
               </Button>
             </div>
 
@@ -152,12 +159,26 @@ export default function Checkout() {
 }
 
 // Reusable PaymentOption component
-const PaymentOption = ({ id, label, imageUrl }) => (
-  <div className="flex items-center gap-4 border p-4">
-    <input type="radio" name="payment" id={id} />
+const PaymentOption = ({ id, label, imageUrl, isSelected, onSelect }) => (
+  <div
+    className={`flex items-center gap-4 border p-4 cursor-pointer ${
+      isSelected ? "bg-slate-200" : ""
+    }`}
+    onClick={onSelect}
+  >
+    <input
+      type="radio"
+      name="payment"
+      id={id}
+      checked={isSelected}
+      onChange={onSelect}
+      className="cursor-pointer"
+    />
     <div className="flex items-center gap-2">
       {imageUrl && <img src={imageUrl} alt={label} className="w-10 h-10" />}
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id} className="cursor-pointer">
+        {label}
+      </label>
     </div>
   </div>
 );

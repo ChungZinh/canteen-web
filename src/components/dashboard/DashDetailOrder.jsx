@@ -1,7 +1,16 @@
 import { Table, Timeline } from "flowbite-react";
 import React from "react";
+import { useLocation } from "react-router-dom";
+import { formatCreatedAt } from "../../utils/formatDate";
 
 export default function DashDetailOrder() {
+  const location = useLocation();
+  const { order } = location.state || {};
+  const orderTotal = order.foods.reduce((acc, cur) => acc + cur.total, 0);
+  const [orderDiscount, setOrderDiscount] = React.useState(
+    orderTotal - order.amount || 0
+  );
+
   const orderDetail = {
     id: 1,
     orderId: "123456",
@@ -76,23 +85,20 @@ export default function DashDetailOrder() {
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-semibold ">
-              Order #{orderDetail.orderId}
-            </h1>
+            <h1 className="text-3xl font-semibold ">Order #{order._id}</h1>
             <div className="">
               <span
                 className={`${
-                  orderDetail.status === "Delivered" ||
-                  orderDetail.status === "Completed"
+                  order.status === "Đã đặt" || order.status === "Đã thanh toán"
                     ? "bg-lime-100 text-lime-600"
                     : "bg-red-100 text-red-600"
                 } p-1 rounded-md`}
               >
-                {orderDetail.status}
+                {order.status}
               </span>
             </div>
           </div>
-          <p className="text-slate-500">{orderDetail.date}</p>
+          <p className="text-slate-500">{formatCreatedAt(order.createdAt)}</p>
         </div>
       </div>
 
@@ -112,8 +118,8 @@ export default function DashDetailOrder() {
                     <Table.HeadCell>Total</Table.HeadCell>
                   </Table.Head>
                   <Table.Body className="divide-y">
-                    {orderDetail.products.map((product) => (
-                      <Table.Row key={product.id}>
+                    {order.foods.map((product) => (
+                      <Table.Row key={product._id}>
                         <Table.Cell>
                           <div className="flex items-center gap-4">
                             <img
@@ -124,9 +130,13 @@ export default function DashDetailOrder() {
                             <p>{product.name}</p>
                           </div>
                         </Table.Cell>
-                        <Table.Cell>${product.price}</Table.Cell>
+                        <Table.Cell>
+                          {product.price.toLocaleString()}đ
+                        </Table.Cell>
                         <Table.Cell>{product.quantity}</Table.Cell>
-                        <Table.Cell>${product.total}</Table.Cell>
+                        <Table.Cell>
+                          {product.total.toLocaleString()}đ
+                        </Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
@@ -135,30 +145,23 @@ export default function DashDetailOrder() {
                   <div className=" mt-4 w-1/4">
                     {/* SUBTOTAL */}
                     <div className="flex justify-between">
-                      <p>Subtotal</p>
+                      <p>Tổng phụ</p>
                       <p>
-                        $
-                        {orderDetail.products.reduce(
-                          (acc, cur) => acc + cur.total,
-                          0
-                        )}
+                        {order.foods
+                          .reduce((acc, cur) => acc + cur.total, 0)
+                          .toLocaleString()}
+                        đ
                       </p>
                     </div>
                     {/* DISCOUNT */}
                     <div className="flex justify-between">
-                      <p>Discount</p>
-                      <p>$0</p>
+                      <p>Giảm giá</p>
+                      <p>{orderDiscount.toLocaleString()}đ</p>
                     </div>
                     {/* TOTAL */}
                     <div className="flex justify-between">
                       <p>Total</p>
-                      <p>
-                        $
-                        {orderDetail.products.reduce(
-                          (acc, cur) => acc + cur.total,
-                          0
-                        )}
-                      </p>
+                      <p>{order.amount.toLocaleString()}đ</p>
                     </div>
                   </div>
                 </div>
@@ -191,27 +194,27 @@ export default function DashDetailOrder() {
           <div className="w-1/4 ">
             {/* CUSTOMER DETAIL */}
             <div className="bg-white shadow-md rounded-md p-4 h-fit space-y-4">
-              <h1 className="font-semibold">Customer details</h1>
+              <h1 className="font-semibold">Chi tiết khách hàng</h1>
               <div className="flex items-center gap-4">
                 <img
-                  src={orderDetail.customer.avatar}
+                  src={order.user.avatar}
                   alt="avatar"
                   className="h-14 w-14 rounded-full"
                 />
                 <div className="">
-                  <p className="font-semibold">{orderDetail.customer.name}</p>
-                  <p>Customer ID: #{orderDetail.customer.id}</p>
+                  <p className="font-semibold">{order.user.name}</p>
+                  <p className="text-xs">Customer ID: #{order.user._id}</p>
                 </div>
               </div>
               <div className="*:text-sm space-y-2 mt-4">
-                <p className="font-semibold">Contact info</p>
-                <p>Email: {orderDetail.customer.email}</p>
-                <p>Phone: {orderDetail.customer.phone}</p>
+                <p className="font-semibold">Thông tin liên hệ</p>
+                <p>Email: {order.user.email}</p>
+                <p>Phone: {order.user.phone}</p>
               </div>
             </div>
 
             {/* SHIPPING ADDRESS */}
-            <div className="bg-white shadow-md rounded-md p-4 h-fit mt-4">
+            {/* <div className="bg-white shadow-md rounded-md p-4 h-fit mt-4">
               <h1 className="font-semibold">Shipping address</h1>
               <div className="space-y-2 mt-4">
                 <p className="font-semibold">
@@ -220,7 +223,7 @@ export default function DashDetailOrder() {
                 <p>{orderDetail.shippingAddress.address}</p>
                 <p>{orderDetail.shippingAddress.phone}</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
