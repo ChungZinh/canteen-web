@@ -2,22 +2,20 @@ import {
   Button,
   Dropdown,
   Pagination,
-  Select,
   Table,
   TextInput,
 } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BiExport } from "react-icons/bi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { LuEye } from "react-icons/lu";
 import { MdMoreVert } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { buildQueryString } from "../../utils/buildQueryString";
 import orderApi from "../../api/orderApi";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { formatCreatedAt } from "../../utils/formatDate";
-import { nav } from "framer-motion/client";
 
 export default function DashListOrders() {
   const { currentUser } = useSelector((state) => state.user);
@@ -28,6 +26,7 @@ export default function DashListOrders() {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUpdate, setIsUpdate] = useState(false);
   const navigate = useNavigate();
   const onPageChange = (pageN) => {
     if (pageN < 1 || pageN > totalPages) return;
@@ -51,10 +50,27 @@ export default function DashListOrders() {
     };
 
     fetchOrders();
-  }, [currentUser?._id, query]);
+  }, [currentUser?._id, query, isUpdate]);
 
   const handleDetail = (order) => {
     navigate(`/dashboard?tab=detailOrders`, { state: { order } });
+  };
+
+  const handleDelete = async (order) => {
+    try {
+      const response = await orderApi.delete(
+        order._id,
+        currentUser,
+        accessToken
+      );
+      if (response.message) {
+        toast.success("Delete order successfully");
+        setIsUpdate(!isUpdate);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete order");
+    }
   };
 
   return (
@@ -137,7 +153,10 @@ export default function DashListOrders() {
                       </div>
                     </Dropdown.Item>
                     <Dropdown.Item>
-                      <div className="flex items-center">
+                      <div
+                        onClick={() => handleDelete(order)}
+                        className="flex items-center"
+                      >
                         <IoIosRemoveCircleOutline size={20} />
                         <span className="ml-2">Delete</span>
                       </div>

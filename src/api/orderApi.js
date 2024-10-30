@@ -23,7 +23,16 @@ const orderApi = {
     });
   },
 
-  //get all orders
+  //delete order
+  delete(id, currentUser, accessToken) {
+    const url = `/orders/${id}`;
+    return axiosClient.delete(url, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
 };
 
 export default orderApi;
