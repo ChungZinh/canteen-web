@@ -1,5 +1,6 @@
 import {
   Button,
+  Dropdown,
   Label,
   Select,
   Spinner,
@@ -16,6 +17,8 @@ import { toast, ToastContainer } from "react-toastify";
 import { uploadFileToS3 } from "../../aws/s3UploadImage";
 import { s3Config } from "../../aws/s3Config";
 import foodApi from "../../api/foodApi";
+import { MdModeEdit, MdMoreVert } from "react-icons/md";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 
 export default function DashAddProduct() {
   const [categories, setCategories] = useState([]);
@@ -99,17 +102,13 @@ export default function DashAddProduct() {
     e.preventDefault();
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await foodApi.create(
-        formData,
-        currentUser,
-        accessToken
-      );
+      const response = await foodApi.create(formData, currentUser, accessToken);
       console.log("Response", response.data);
       if (response.data) {
         toast.success(response.message);
         setFormData({
           name: "",
-          quantity: "",
+          stock: "",
           price: "",
           description: "",
           category: "",
@@ -206,7 +205,7 @@ export default function DashAddProduct() {
       setIsEditing(true);
       setFormData({
         name: product.name,
-        quantity: product.quantity,
+        stock: product.stock,
         price: product.price,
         description: product.description,
         category: product.category,
@@ -229,7 +228,7 @@ export default function DashAddProduct() {
         toast.success(response.message);
         setFormData({
           name: "",
-          quantity: "",
+          stock: "",
           price: "",
           description: "",
           category: "",
@@ -250,8 +249,12 @@ export default function DashAddProduct() {
         <div className="">
           <div className="flex items-center justify-between">
             <div className="">
-              <h1 className="text-3xl font-semibold ">Add Products</h1>
-              <p className="text-slate-500">Add your products here</p>
+              <h1 className="text-3xl font-semibold ">
+                {isEditing ? "Cập nhật" : "Thêm"} món ăn
+              </h1>
+              <p className="text-slate-500">
+                {isEditing ? "Cập nhật" : "Thêm"} món ăn vào danh sách
+              </p>
             </div>
             <div className="">
               <Button
@@ -261,7 +264,7 @@ export default function DashAddProduct() {
               >
                 <HiSave size={20} />
                 <span className="ml-2">
-                  {isEditing ? "Update" : "Add"} Product
+                  {isEditing ? "Cập nhật" : "Thêm"} món ăn
                 </span>
               </Button>
             </div>
@@ -269,9 +272,9 @@ export default function DashAddProduct() {
           <div className="mt-8 bg-white p-4 rounded-md shadow-md">
             <form onSubmit={isEditing ? handleUpdateProduct : handleAddProduct}>
               <div className="space-y-2">
-                <Label className="mt-4">Product Name</Label>
+                <Label className="mt-4">Tên món ăn</Label>
                 <TextInput
-                  placeholder="Enter product name"
+                  placeholder="Nhập tên món ăn"
                   name="name"
                   onChange={handleChange}
                   value={formData.name}
@@ -279,21 +282,21 @@ export default function DashAddProduct() {
               </div>
 
               <div className="space-y-2 mt-4">
-                <Label className="mt-4">Product Quantity</Label>
+                <Label className="mt-4">Số lượng </Label>
                 <TextInput
-                  placeholder="Enter product quantity"
-                  name="quantity"
+                  placeholder="Nhập số lượng"
+                  name="stock"
                   type="number"
                   onChange={handleChange}
-                  value={formData.quantity}
+                  value={formData.stock}
                 />
               </div>
 
               <div className="space-y-2 flex items-center justify-center gap-4 mt-4">
                 <div className="w-1/2 space-y-2">
-                  <Label className="mt-4">Product Category</Label>
+                  <Label className="mt-4">Danh mục món ăn</Label>
                   <Select name="category" onChange={handleChange}>
-                    <option>Select Category</option>
+                    <option>Chọn danh mục món ăn</option>
                     {categories.map((category) => (
                       <option key={category.id} value={category._id}>
                         {category.name}
@@ -302,9 +305,9 @@ export default function DashAddProduct() {
                   </Select>
                 </div>
                 <div className="w-1/2 space-y-1">
-                  <Label className="mt-4">Product Price</Label>
+                  <Label className="mt-4">Giá món ăn</Label>
                   <TextInput
-                    placeholder="Enter product price"
+                    placeholder="Nhập giá"
                     name="price"
                     onChange={handleChange}
                     type="number"
@@ -314,7 +317,7 @@ export default function DashAddProduct() {
               </div>
 
               <div className="space-y-2 mt-4">
-                <Label className="mt-4">Product Image</Label>
+                <Label className="mt-4">Hình ảnh món ăn</Label>
                 <div className="flex gap-2">
                   <input
                     type="file"
@@ -323,7 +326,7 @@ export default function DashAddProduct() {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                   <Button
-                    className="px-4 inline text-center"
+                    className="w-[105px] px-2 inline text-center"
                     onClick={handleUpload}
                   >
                     {loading ? (
@@ -332,17 +335,17 @@ export default function DashAddProduct() {
                         <span className="pl-3">Loading...</span>
                       </div>
                     ) : (
-                      "Upload"
+                      "Tải lên"
                     )}
                   </Button>
                 </div>
               </div>
 
               <div className="mt-4 space-y-2">
-                <Label className="mt-4">Product Description</Label>
+                <Label className="mt-4">Mô tả món ăn</Label>
                 <Textarea
                   rows={8}
-                  placeholder="Enter product description"
+                  placeholder="Nhập mô tả món ăn"
                   name="description"
                   onChange={handleChange}
                   value={formData.description}
@@ -358,8 +361,8 @@ export default function DashAddProduct() {
         <div className="">
           <div className="flex items-center justify-between">
             <div className="">
-              <h1 className="text-3xl font-semibold ">Add Category</h1>
-              <p className="text-slate-500">Add your category here</p>
+              <h1 className="text-3xl font-semibold ">Danh mục món ăn</h1>
+              <p className="text-slate-500">Thêm, sửa, xóa danh mục món ăn</p>
             </div>
             <div className="">
               <Button
@@ -368,7 +371,7 @@ export default function DashAddProduct() {
               >
                 <HiSave size={20} />
                 <span className="ml-2">
-                  {isEditing ? "Update" : "Add"} Category
+                  {isEditing ? "Cập nhật" : "Thêm"} danh mục
                 </span>
               </Button>
             </div>
@@ -378,16 +381,16 @@ export default function DashAddProduct() {
               onSubmit={isEditing ? handleUpdateCategory : handleAddCategory}
             >
               <div className="space-y-2">
-                <Label className="mt-4">Category Name</Label>
+                <Label className="mt-4">Tên danh mục</Label>
                 <TextInput
-                  placeholder="Enter category name"
+                  placeholder="Nhập tên danh mục"
                   name="name"
                   onChange={handleChange}
                   value={formData.name}
                 />
               </div>
               <div className="space-y-2 mt-4">
-                <Label className="mt-4">Product Image</Label>
+                <Label className="mt-4">Hình ảnh danh mục</Label>
                 <div className="flex gap-2">
                   <input
                     type="file"
@@ -396,7 +399,7 @@ export default function DashAddProduct() {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                   <Button
-                    className="px-4 inline text-center"
+                    className="w-[90px] inline text-center"
                     onClick={handleUpload}
                   >
                     {loading ? (
@@ -405,18 +408,18 @@ export default function DashAddProduct() {
                         <span className="pl-3">Loading...</span>
                       </div>
                     ) : (
-                      "Upload"
+                      "Tải lên"
                     )}
                   </Button>
                 </div>
               </div>
               <div className="mt-4 space-y-2">
-                <Label className="mt-4">Product Description</Label>
+                <Label className="mt-4">Mô tả danh mục</Label>
                 <Textarea
                   rows={8}
                   name="description"
                   onChange={handleChange}
-                  placeholder="Enter product description"
+                  placeholder="Nhập mô tả danh mục"
                   value={formData.description}
                 />
               </div>
@@ -427,11 +430,10 @@ export default function DashAddProduct() {
             <div className="mt-4">
               <Table striped>
                 <Table.Head>
-                  <Table.HeadCell>Category name</Table.HeadCell>
-                  <Table.HeadCell>Description</Table.HeadCell>
-                  <Table.HeadCell>Image</Table.HeadCell>
-                  <Table.HeadCell>isDeleted</Table.HeadCell>
-                  <Table.HeadCell>Edit</Table.HeadCell>
+                  <Table.HeadCell>Tên danh mục</Table.HeadCell>
+                  <Table.HeadCell>Mô tả</Table.HeadCell>
+                  <Table.HeadCell>Hình ảnh</Table.HeadCell>
+                  <Table.HeadCell>Action</Table.HeadCell>
                 </Table.Head>
                 <Table.Body className="divide-y">
                   {categories.map((category) => (
@@ -446,23 +448,32 @@ export default function DashAddProduct() {
                         />
                       </Table.Cell>
                       <Table.Cell>
-                        {category.isDeleted ? "Yes" : "No"}
-                      </Table.Cell>
-                      <Table.Cell>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            className="bg-slate-600"
-                            onClick={() => handleEdit(category)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            className="bg-red-600"
-                            onClick={() => handleDeleteCategory(category._id)}
-                          >
-                            {category.isDeleted ? "Restore" : "Delete"}
-                          </Button>
-                        </div>
+                        <Dropdown
+                          arrowIcon={false}
+                          inline
+                          label={
+                            <MdMoreVert size={20} className="text-slate-500" />
+                          }
+                        >
+                          <Dropdown.Item>
+                            <div
+                              onClick={() => handleEdit(category)}
+                              className="flex items-center"
+                            >
+                              <MdModeEdit size={20} />
+                              <span className="ml-2">Chỉnh sửa</span>
+                            </div>
+                          </Dropdown.Item>
+                          <Dropdown.Item>
+                            <div
+                              onClick={() => handleDeleteCategory(category._id)}
+                              className="flex items-center"
+                            >
+                              <IoIosRemoveCircleOutline size={20} />
+                              <span className="ml-2">Xóa</span>
+                            </div>
+                          </Dropdown.Item>
+                        </Dropdown>
                       </Table.Cell>
                     </Table.Row>
                   ))}

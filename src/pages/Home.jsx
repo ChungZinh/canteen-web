@@ -20,8 +20,9 @@ import {
   FOOD_DRINK,
   FOOD_LUNCH,
 } from "../constants/categories";
+import menuApi from "../api/menuApi";
 export default function Home() {
-  const [query, setQuery] = useState({ all: true });
+  const [query, setQuery] = useState({ all: true, isSoldOut: false });
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
@@ -32,23 +33,37 @@ export default function Home() {
     "Thức uống",
   ]);
 
+  // Danh sách các ngày trong tuần (theo thứ tự)
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // Lấy ngày hiện tại
+  const getCurrentDay = () => {
+    const currentDate = new Date();
+    return daysOfWeek[currentDate.getDay()]; // Trả về tên ngày hiện tại
+  };
+  const [selectedDay, setSelectedDay] = useState(getCurrentDay()); // Ngày mặc định là ngày hiện tại
   const [foodMain, setFoodMain] = useState([]);
   const [foodSide, setFoodSide] = useState([]);
   const [foodDrink, setFoodDrink] = useState([]);
-
   const [selectCategory, setSelectCategory] = useState("Món chính");
 
   // Dish dummy data
   useEffect(() => {
     // Fetch
     setLoading(true);
-    const fetchFoods = async () => {
-      const queryB = buildQueryString(query);
-      const response = await foodApi.getAllFoods(queryB);
+    const fetchMenuForDay = async () => {
+      const response = await menuApi.getMenuForDay(selectedDay, "");
       if (response.data) {
         setProducts(response.data.foods);
         setLoading(false);
-
         const foods = response.data.foods;
 
         // Khởi tạo các danh sách rỗng
@@ -75,11 +90,48 @@ export default function Home() {
         setFoodMain(mainDishes);
         setFoodSide(sideDishes);
         setFoodDrink(drinks);
-      } else {
-        toast.error("Failed to fetch foods");
-        setLoading(false);
       }
     };
+    fetchMenuForDay();
+
+    // const fetchFoods = async () => {
+    //   const queryB = buildQueryString(query);
+    //   const response = await foodApi.getAllFoods(queryB);
+    //   if (response.data) {
+    //     setProducts(response.data.foods);
+    //     setLoading(false);
+
+    //     const foods = response.data.foods;
+
+    //     // Khởi tạo các danh sách rỗng
+    //     const mainDishes = [];
+    //     const sideDishes = [];
+    //     const drinks = [];
+
+    //     // Duyệt qua các sản phẩm và phân loại dựa trên category
+    //     foods.forEach((food) => {
+    //       if (
+    //         food.category.name === FOOD_BREAKFAST ||
+    //         food.category.name === FOOD_LUNCH ||
+    //         food.category.name === FOOD_DINNER
+    //       ) {
+    //         mainDishes.push(food);
+    //       } else if (food.category.name === FOOD_DESSERT) {
+    //         sideDishes.push(food);
+    //       } else if (food.category.name === FOOD_DRINK) {
+    //         drinks.push(food);
+    //       }
+    //     });
+
+    //     // Cập nhật state với dữ liệu đã phân loại
+    //     setFoodMain(mainDishes);
+    //     setFoodSide(sideDishes);
+    //     setFoodDrink(drinks);
+    //   } else {
+    //     toast.error("Failed to fetch foods");
+    //     setLoading(false);
+    //   }
+    // };
 
     const fetchFoodsTop = async () => {
       const response = await foodApi.getTop10SellingProducts();
@@ -93,8 +145,8 @@ export default function Home() {
     };
 
     fetchFoodsTop();
-    fetchFoods();
-  }, [currentUser?._id, query]);
+    // fetchFoods();
+  }, [currentUser?._id, query, selectedDay]);
 
   const sliderRef = useRef(null);
 
@@ -144,9 +196,14 @@ export default function Home() {
           <p className="text-sm md:text-lg">
             Canteen IUH là nơi cung cấp các món ăn ngon...
           </p>
-          <button className="bg-slate-400 text-white px-4 py-2 rounded-md hover:bg-slate-500">
-            Đặt món ngay
-          </button>
+          <div className="flex justify-center md:justify-start ">
+            <Button
+              href="/products"
+              className="bg-slate-400  w-fit text-white px-4 py-2 rounded-md hover:bg-slate-500"
+            >
+              Đặt món ngay
+            </Button>
+          </div>
         </div>
       </div>
 

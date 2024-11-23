@@ -12,6 +12,36 @@ const orderApi = {
     });
   },
 
+  getById(id, currentUser, accessToken) {
+    const url = `/orders/${id}`;
+    return axiosClient.get(url, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  getOrderForChef(query, currentUser, accessToken) {
+    const url = `/orders/chef${query}`;
+    return axiosClient.get(url, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  getStatistics(currentUser, accessToken) {
+    const url = `/orders/statistic`;
+    return axiosClient.get(url, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
   //create order
   create(data, currentUser, accessToken) {
     const url = "/orders";
@@ -32,6 +62,21 @@ const orderApi = {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+  },
+
+  chefUpdateStatus(id, data, currentUser, accessToken) {
+    const url = `/orders/chef/${id}`;
+    return axiosClient.put(url, data, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
+  completedOrder(id, data) {
+    const url = `/orders/complete-order/${id}`;
+    return axiosClient.put(url, data);
   },
 };
 

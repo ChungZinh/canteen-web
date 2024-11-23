@@ -1,7 +1,7 @@
 import { Table, Timeline } from "flowbite-react";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { formatCreatedAt } from "../../utils/formatDate";
+import { formatCreatedAt, formatTimeLine } from "../../utils/formatDate";
 
 export default function DashDetailOrder() {
   const location = useLocation();
@@ -11,73 +11,6 @@ export default function DashDetailOrder() {
     orderTotal - order?.amount || 0
   );
 
-  const orderDetail = {
-    id: 1,
-    orderId: "123456",
-    date: "2021-09-20",
-    customer: {
-      id: 1,
-      name: "John Doe",
-      phone: "1234567890",
-      email: "johndae@gmail.com",
-      avatar:
-        "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/avatars/8.png",
-      address: "123 Main St, New York, NY 10001",
-    },
-    status: "Pending",
-    method: "Cash",
-    products: [
-      {
-        id: 1,
-        name: "Product 1",
-        price: 100,
-        quantity: 2,
-        total: 200,
-        image:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/products/headphone-1.jpg",
-      },
-      {
-        id: 2,
-        name: "Product 2",
-        price: 200,
-        quantity: 1,
-        total: 200,
-        image:
-          "https://demos.themeselection.com/marketplace/materio-mui-nextjs-admin-template/demo-1/images/products/headphone-2.jpg",
-      },
-    ],
-    shippingAddress: {
-      name: "John Doe",
-      phone: "1234567890",
-      address: "123 Main St, New York, NY 10001",
-    },
-    timeLine: [
-      {
-        id: 1,
-        title: "Order Placed",
-        date: "2021-09-20",
-        time: "10:00 AM",
-      },
-      {
-        id: 2,
-        title: "Order Confirmed",
-        date: "2021-09-20",
-        time: "10:30 AM",
-      },
-      {
-        id: 3,
-        title: "Order Shipped",
-        date: "2021-09-20",
-        time: "11:00 AM",
-      },
-      {
-        id: 4,
-        title: "Order Delivered",
-        date: "2021-09-21",
-        time: "10:00 AM",
-      },
-    ],
-  };
 
   return (
     <div className="h-screen w-full bg-slate-200 p-6 overflow-y-scroll">
@@ -89,8 +22,11 @@ export default function DashDetailOrder() {
             <div className="">
               <span
                 className={`${
-                  order?.status === "Đã đặt" ||
-                  order?.status === "Đã thanh toán"
+                  order.status === "Đã đặt" ||
+                  order.status === "Đã thanh toán" ||
+                  order.status === "Đang chuẩn bị" ||
+                  order.status === "Đã chuẩn bị" ||
+                  order.status === "Đã hoàn tất"
                     ? "bg-lime-100 text-lime-600"
                     : "bg-red-100 text-red-600"
                 } p-1 rounded-md`}
@@ -128,7 +64,7 @@ export default function DashDetailOrder() {
                               alt="product"
                               className="h-12 w-12 rounded-md"
                             />
-                            <p>{product.name}</p>
+                            <p className="font-semibold">{product.name}</p>
                           </div>
                         </Table.Cell>
                         <Table.Cell>
@@ -174,17 +110,17 @@ export default function DashDetailOrder() {
               <h1 className="font-semibold">Order timeline</h1>
               <div className="space-y-4 mt-4">
                 <Timeline>
-                  {orderDetail.timeLine.map((time) => (
+                  {order?.timeline.map((time) => (
                     <Timeline.Item
-                      key={time.id}
+                      key={time._id}
                       className="flex items-center gap-4"
                     >
                       <Timeline.Point />
                       <Timeline.Content>
                         <Timeline.Time>
-                          {time.date} at {time.time}
+                          {formatTimeLine(time?.timestamp)}
                         </Timeline.Time>
-                        <Timeline.Body>{time.title}</Timeline.Body>
+                        <Timeline.Body>{time?.status}</Timeline.Body>
                       </Timeline.Content>
                     </Timeline.Item>
                   ))}
@@ -198,19 +134,19 @@ export default function DashDetailOrder() {
               <h1 className="font-semibold">Chi tiết khách hàng</h1>
               <div className="flex items-center gap-4">
                 <img
-                  src={order?.user.avatar}
+                  src={order?.user?.avatar}
                   alt="avatar"
                   className="h-14 w-14 rounded-full"
                 />
                 <div className="">
-                  <p className="font-semibold">{order?.user.name}</p>
-                  <p className="text-xs">Customer ID: #{order?.user._id}</p>
+                  <p className="font-semibold">{order?.user?.name}</p>
+                  <p className="text-xs">Customer ID: #{order?.user?._id}</p>
                 </div>
               </div>
               <div className="*:text-sm space-y-2 mt-4">
                 <p className="font-semibold">Thông tin liên hệ</p>
-                <p>Email: {order?.user.email}</p>
-                <p>Phone: {order?.user.phone}</p>
+                <p>Email: {order?.user?.email}</p>
+                <p>Phone: {order?.user?.phone}</p>
               </div>
             </div>
 

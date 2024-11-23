@@ -1,7 +1,47 @@
 import { HR } from "flowbite-react";
 import bg2 from "../assets/imgs/bg4.png";
+import { useState } from "react";
+import sendMailApi from "../api/sendMailApi";
+import { toast } from "react-toastify";
 
 export default function Contact() {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await sendMailApi.sendMailContact(formData);
+
+      if (response.success) {
+        toast.success("Dữ liệu đã được gửi thành công.");
+        setFormData({
+          name: "",
+          email: "",
+          message: "",
+        });
+        setLoading(false);
+      } else {
+        toast.error("Dữ liệu gửi thất bại.");
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error("Dữ liệu gửi thất bại.");
+      setLoading(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="overflow-x-hidden">
       <div
@@ -54,8 +94,7 @@ export default function Contact() {
               </div>
               <div className="p-4 border rounded-md space-y-2 ">
                 <p className="font-semibold">Thời gian làm việc</p>
-                <p className="text-sm">Thứ 2 - Thứ 6: 8:00 - 22:00</p>
-                <p className="text-sm">Thứ 7 - Chủ Nhật: 7:00 - 18:00</p>
+                <p className="text-sm">Thứ 2 - Chủ Nhật: 8:00 - 22:00</p>
               </div>
             </div>
           </div>
@@ -65,7 +104,7 @@ export default function Contact() {
               Gửi thắc mắc cho chúng tôi
             </h2>
             <HR.Trimmed />
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Input */}
               <div>
                 <label
@@ -80,6 +119,8 @@ export default function Contact() {
                   name="name"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   placeholder="Nhập họ tên của bạn"
+                  onChange={handleChange}
+                  value={formData.name}
                 />
               </div>
 
@@ -94,6 +135,8 @@ export default function Contact() {
                 <input
                   type="email"
                   id="email"
+                  onChange={handleChange}
+                  value={formData.email}
                   name="email"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   placeholder="Nhập email của bạn"
@@ -112,6 +155,8 @@ export default function Contact() {
                   id="message"
                   name="message"
                   rows="4"
+                  onChange={handleChange}
+                  value={formData.message}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   placeholder="Nhập câu hỏi của bạn"
                 ></textarea>
@@ -119,9 +164,14 @@ export default function Contact() {
 
               {/* Submit Button */}
               <div className="text-center">
+                {loading && (
+                  <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-900"></div>
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="w-full bg-slate-400 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white  hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-slate-600 duration-300"
+                  className="w-full bg-slate-600 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white  hover:bg-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-slate-600 duration-300"
                 >
                   Gửi
                 </button>

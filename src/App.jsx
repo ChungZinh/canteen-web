@@ -16,6 +16,9 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import { ToastContainer } from "react-toastify";
 import CheckoutStep2 from "./pages/CheckoutStep2";
+import ChefDashboard from "./pages/ChefDashboard";
+import CompleteOrder from "./pages/CompleteOrder";
+import DepositMoney from "./pages/DepositMoney";
 
 function App() {
   return (
@@ -31,14 +34,18 @@ function App() {
           <Route path="/products" element={<Product />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/complete-order/:id" element={<CompleteOrder />} />
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout-step-2" element={<CheckoutStep2 />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/deposit" element={<DepositMoney />} />
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chef-dashboard" element={<ChefDashboard />} />
           </Route>
+
           <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
         <ToastContainer

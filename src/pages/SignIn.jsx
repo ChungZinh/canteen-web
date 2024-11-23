@@ -16,7 +16,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    studentId: "",
+    email: "",
     password: "",
   });
 
@@ -67,13 +67,13 @@ export default function SignIn() {
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Mã sinh viên
+              Email
             </label>
 
             <TextInput
-              id="studentId"
-              name="studentId"
-              placeholder="Nhập mã sinh viên của bạn"
+              id="email"
+              name="email"
+              placeholder="Nhập email của bạn"
               onChange={handleChange}
             />
           </div>

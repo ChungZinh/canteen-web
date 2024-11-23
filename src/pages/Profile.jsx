@@ -1,9 +1,55 @@
-import { Avatar, Badge, Button, Card, Table, TableHead } from "flowbite-react";
+import {
+  Accordion,
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Pagination,
+  Table,
+} from "flowbite-react";
 import { TbCoin } from "react-icons/tb";
 import { useSelector } from "react-redux";
+import { formatCreatedAt } from "../utils/formatDate";
+import { useEffect, useState } from "react";
+import userApi from "../api/userApi";
+import { buildQueryString } from "../utils/buildQueryString";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
+  const accessToken = localStorage.getItem("accessToken");
+  const [user, setUser] = useState(null);
+  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transaction, setTransaction] = useState([]);
+  const navigate = useNavigate();
+  const onPageChange = (pageN) => {
+    if (pageN < 1 || pageN > totalPages) return;
+    setCurrentPage(pageN);
+    setQuery((prev) => ({ ...prev, page: pageN }));
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const queryB = buildQueryString(query);
+      const response = await userApi.getUserById(
+        currentUser._id,
+        queryB,
+        currentUser,
+        accessToken
+      );
+      setUser(response.data.user);
+      setTransaction(response.data.user?.wallet?.transactions);
+      setOrders(response.data.orders);
+      setTotalPages(response.data.totalPages);
+    };
+    fetchUser();
+  }, [currentUser, accessToken, page, query]);
+
+  console.log("user", user);
   const wallet = {
     balance: 70000,
     transaction: [
@@ -28,62 +74,6 @@ export default function Profile() {
     ],
   };
 
-  const listOrders = [
-    {
-      id: 1,
-      date: "2022-10-10",
-      products: [
-        {
-          name: "Mì tôm",
-          quantity: 2,
-          price: 10000,
-        },
-        {
-          name: "Coca cola",
-          quantity: 1,
-          price: 5000,
-        },
-      ],
-      status: "Đã giao",
-      total: 25000,
-    },
-    {
-      id: 2,
-      date: "2022-10-11",
-      products: [
-        {
-          name: "Mì tôm",
-          quantity: 2,
-          price: 10000,
-        },
-        {
-          name: "Coca cola",
-          quantity: 1,
-          price: 5000,
-        },
-      ],
-      status: "Đã giao",
-      total: 25000,
-    },
-    {
-      id: 3,
-      date: "2022-10-12",
-      products: [
-        {
-          name: "Mì tôm",
-          quantity: 2,
-          price: 10000,
-        },
-        {
-          name: "Coca cola",
-          quantity: 1,
-          price: 5000,
-        },
-      ],
-      status: "Đã giao",
-      total: 25000,
-    },
-  ];
   return (
     <div className="overflow-x-hidden">
       <div className="max-w-screen-xl mx-auto mt-[120px]  justify-center items-center  bg-opacity-70 backdrop-blur-sm">
@@ -120,10 +110,15 @@ export default function Profile() {
                   <div className="flex items-center gap-2">
                     <TbCoin className="h-6 w-6" />
                     <span className="text-lg font-bold">
-                      {wallet.balance.toLocaleString()}đ
+                      {user?.wallet?.balance.toLocaleString()}đ
                     </span>
                   </div>
-                  <Button className="bg-slate-600">Nạp Tiền</Button>
+                  <Button
+                    className="bg-slate-600"
+                    onClick={() => navigate("/deposit")}
+                  >
+                    Nạp Tiền
+                  </Button>
                 </div>
               </div>
             </div>
@@ -161,83 +156,155 @@ export default function Profile() {
             <h1 className="text-2xl font-bold border-b pb-4">
               Lịch sử giao dịch
             </h1>
-            <div className="">
-              <Table striped>
-                <Table.Head>
-                  <Table.HeadCell>STT</Table.HeadCell>
-                  <Table.HeadCell>Số tiền</Table.HeadCell>
-                  <Table.HeadCell>Ngày</Table.HeadCell>
-                  <Table.HeadCell>Mô tả</Table.HeadCell>
-                </Table.Head>
-                <Table.Body>
-                  {wallet.transaction.map((item) => (
-                    <Table.Row key={item.id}>
-                      <Table.Cell>{item.id}</Table.Cell>
-                      <Table.Cell>
-                        {item.amount > 0 ? (
-                          <Badge color="success">
-                            {item.amount.toLocaleString()}đ
-                          </Badge>
-                        ) : (
-                          <Badge color="failure">
-                            {item.amount.toLocaleString()}đ
-                          </Badge>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell>{item.date}</Table.Cell>
-                      <Table.Cell>{item.description}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            </div>
-          </Card>
-        </div>
-
-        <div className="mt-8 mb-8">
-          <Card className="w-full">
-            <h1 className="text-2xl font-bold border-b pb-4">
-              Lịch sử mua hàng
-            </h1>
-            <div className="">
+            {transaction?.length === 0 || transaction === null ? (
+              <div className="flex justify-center items-center h-[200px]">
+                <p>Không có dữ liệu</p>
+              </div>
+            ) : (
               <div className="">
                 <Table striped>
                   <Table.Head>
                     <Table.HeadCell>STT</Table.HeadCell>
+                    <Table.HeadCell>Số tiền</Table.HeadCell>
                     <Table.HeadCell>Ngày</Table.HeadCell>
-                    <Table.HeadCell>Tên sản phẩm</Table.HeadCell>
-                    <Table.HeadCell>Số lượng</Table.HeadCell>
-                    <Table.HeadCell>Giá</Table.HeadCell>
-                    <Table.HeadCell>Trạng thái</Table.HeadCell>
-                    <Table.HeadCell>Tổng tiền</Table.HeadCell>
+                    <Table.HeadCell>Mô tả</Table.HeadCell>
                   </Table.Head>
                   <Table.Body>
-                    {listOrders.map((order, index) => (
-                      <Table.Row key={order.id}>
-                        <Table.Cell>{index + 1}</Table.Cell>
-                        <Table.Cell>{order.date}</Table.Cell>
-                        <Table.Cell colSpan={3}>
-                          <table className="w-full">
-                            <tbody>
-                              {order.products.map((product, idx) => (
-                                <tr key={idx}>
-                                  <td>{product.name}</td>
-                                  <td>{product.quantity}</td>
-                                  <td>{product.price.toLocaleString()}đ</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                    {transaction?.map((item) => (
+                      <Table.Row key={item.id}>
+                        <Table.Cell>{item.id}</Table.Cell>
+                        <Table.Cell>
+                          {item.amount > 0 ? (
+                            <Badge color="success">
+                              {item.amount.toLocaleString()}đ
+                            </Badge>
+                          ) : (
+                            <Badge color="failure">
+                              {item.amount.toLocaleString()}đ
+                            </Badge>
+                          )}
                         </Table.Cell>
-                        <Table.Cell>{order.status}</Table.Cell>
-                        <Table.Cell>{order.total.toLocaleString()}đ</Table.Cell>
+                        <Table.Cell>{item.date}</Table.Cell>
+                        <Table.Cell>{item.description}</Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
                 </Table>
               </div>
-            </div>
+            )}
           </Card>
+        </div>
+
+        <div className="mt-8 mb-8">
+          {orders?.length === 0 ? (
+            <Card className="w-full">
+              <h1 className="text-2xl font-bold border-b pb-4">
+                Lịch sử mua hàng
+              </h1>
+              <div className="flex justify-center items-center h-[200px]">
+                <p>Không có dữ liệu</p>
+              </div>
+            </Card>
+          ) : (
+            <Card className="w-full">
+              <h1 className="text-2xl font-bold border-b pb-4">
+                Lịch sử mua hàng
+              </h1>
+              <div className="">
+                <div className="">
+                  <Table striped>
+                    <Table.Head>
+                      <Table.HeadCell>STT</Table.HeadCell>
+                      <Table.HeadCell>Ngày</Table.HeadCell>
+                      <Table.HeadCell style={{ width: "20%" }}>
+                        Trạng thái
+                      </Table.HeadCell>
+                      <Table.HeadCell>Chi tiết đơn hàng</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body>
+                      {orders?.map((order, index) => (
+                        <Table.Row key={order._id}>
+                          <Table.Cell>{index + 1}</Table.Cell>
+                          <Table.Cell>
+                            {formatCreatedAt(order.createdAt)}
+                          </Table.Cell>
+                          <Table.Cell>
+                            <span
+                              className={`${
+                                order.status === "Đã đặt" ||
+                                order.status === "Đã thanh toán" ||
+                                order.status === "Đang chuẩn bị" ||
+                                order.status === "Đã chuẩn bị" ||
+                                order.status === "Đã hoàn tất"
+                                  ? "bg-lime-100 text-lime-600"
+                                  : "bg-red-100 text-red-600"
+                              } p-1 rounded-md`}
+                            >
+                              {order?.status}
+                            </span>
+                          </Table.Cell>
+
+                          <Table.Cell colSpan={3} style={{ width: "80%" }}>
+                            <Accordion style={{ width: "100%" }}>
+                              <Accordion.Panel>
+                                <Accordion.Title>
+                                  Chi tiết đơn hàng
+                                </Accordion.Title>
+                                <Accordion.Content>
+                                  {order.foods.map((food) => (
+                                    <div className="" key={food._id}>
+                                      <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-16 h-16 border p-2 rounded-md relative object-contain">
+                                            <img
+                                              src={food.image}
+                                              className=" object-contain h-full w-full"
+                                            />
+                                            <div className="h-[20px] w-[20px] -top-2 -right-3 flex justify-center items-center font-semibold bg-slate-200 absolute rounded-full text-sm ">
+                                              <p className="text-slate-600">
+                                                {food.quantity}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <h1>
+                                            <p className="font-semibold">
+                                              {food.name}
+                                            </p>
+                                          </h1>
+                                        </div>
+
+                                        <div className="">
+                                          <p>
+                                            {(
+                                              food.quantity * food.price
+                                            ).toLocaleString()}
+                                            ₫
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </Accordion.Content>
+                              </Accordion.Panel>
+                            </Accordion>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table>
+                </div>
+                <div className="mt-8 ">
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                    />
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -4,137 +4,34 @@ import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { LuCircleDollarSign, LuCrown, LuEye, LuGift } from "react-icons/lu";
 import { MdMoreVert, MdOutlineShoppingCart } from "react-icons/md";
 import { TbJewishStar } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import {
+  formatCreatedAt,
+  formatCreatedAt_v1,
+  formatDate_v1,
+} from "../../utils/formatDate";
 
 export default function DashDetailCustomer() {
-  const student = {
-    id: 1,
-    studentId: "123456",
-    fullName: "John Doe",
-    email: "johndoe@gmail.com",
-    phone: "0123456789",
-    address: "123 Street, City, Country",
-    avatar:
-      "https://cdn.pixabay.com/photo/2016/08/31/11/54/icon-1633249_1280.png",
-    point: 100,
-    coupons: [
-      {
-        id: 1,
-        name: "Coupon 1",
-        discount: 10,
-        code: "CODE1",
-        expiredDate: "Oct 9, 2024",
-      },
-      {
-        id: 2,
-        name: "Coupon 2",
-        discount: 20,
-        code: "CODE2",
-        expiredDate: "Oct 10, 2024",
-      },
-    ],
-    wishlist: [
-      {
-        id: 1,
-        name: "Product 1",
-        price: 100,
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 2,
-        name: "Product 2",
-        price: 50,
-        image: "https://via.placeholder.com/150",
-      },
-    ],
-    orders: [
-      {
-        id: 1,
-        date: "Oct 9, 2024",
-        foods: [
-          {
-            id: 1,
-            name: "Food 1",
-            price: 100,
-            image: "https://via.placeholder.com/150",
-            quantity: 2,
-          },
-          {
-            id: 2,
-            name: "Food 2",
-            price: 50,
-            image: "https://via.placeholder.com/150",
-            quantity: 1,
-          },
-        ],
-        total: 150,
-        status: "Delivered",
-      },
-      {
-        id: 2,
-        date: "Oct 10, 2024",
-        amount: 50,
-        foods: [
-          {
-            id: 1,
-            name: "Food 1",
-            price: 100,
-            image: "https://via.placeholder.com/150",
-            quantity: 2,
-          },
-        ],
-        total: 100,
-        status: "Pending",
-      },
-      {
-        id: 3,
-        date: "Oct 10, 2024",
-        amount: 50,
-        foods: [
-          {
-            id: 1,
-            name: "Food 1",
-            price: 100,
-            image: "https://via.placeholder.com/150",
-            quantity: 2,
-          },
-        ],
-        total: 100,
-        status: "Pending",
-      },
-    ],
-    wallet: {
-      balance: 100,
-      transactions: [
-        {
-          id: 1,
-          date: "Oct 9, 2024",
-          amount: 100,
-          type: "Deposit",
-        },
-        {
-          id: 2,
-          date: "Oct 10, 2024",
-          amount: 50,
-          type: "Withdraw",
-        },
-      ],
-    },
-  };
+  const location = useLocation();
+  const { student } = location.state || {};
+
+  console.log("customer", student);
 
   return (
     <div className="h-screen w-full bg-slate-200 p-6 overflow-y-scroll">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold ">Customer ID #{student.id}</h1>
-          <p className="text-slate-500">Oct 9, 2024</p>
+          <h1 className="text-3xl font-semibold ">
+            Customer ID #{student?._id}
+          </h1>
+          <p className="text-slate-500">{formatDate_v1(new Date())}</p>
         </div>
-        <Button className="mt-4 bg-red-500">
+        {/* <Button className="mt-4 bg-red-500">
           <Link to={`/dashboard?tab=addProducts`} className="flex">
             <HiMinus size={20} />
             <span className="ml-2">Delete Customer</span>
           </Link>
-        </Button>
+        </Button> */}
       </div>
 
       <div className="mt-8 flex gap-8">
@@ -142,16 +39,16 @@ export default function DashDetailCustomer() {
         <div className="w-1/3 bg-white h-fit p-6 rounded-md shadow-md">
           <div className="flex flex-col items-center gap-4 mt-12">
             <img
-              src={student.avatar}
-              alt={student.fullName}
+              src={student?.avatar}
+              alt={student?.fullName}
               className="w-20 h-20 object-center rounded-md"
             />
             <div className="">
               <h1 className="text-2xl text-center font-semibold">
-                {student.fullName}
+                {student?.fullName}
               </h1>
               <p className="text-slate-500 text-center">
-                Student ID: {student.studentId}
+                Student/Teacher ID: {student?.studentId}
               </p>
             </div>
             <div className="flex gap-12 mt-6">
@@ -162,8 +59,8 @@ export default function DashDetailCustomer() {
                     <MdOutlineShoppingCart size={25} />
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-slate-500 font-semibold">Orders</p>
-                    <p className="">{student.orders.length}</p>
+                    <p className="text-slate-500 font-semibold">Đơn hàng</p>
+                    <p className="">{student?.orders.length}</p>
                   </div>
                 </div>
               </div>
@@ -174,8 +71,8 @@ export default function DashDetailCustomer() {
                     <LuCircleDollarSign size={25} />
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-slate-500 font-semibold">Point</p>
-                    <p className="">{student.point}</p>
+                    <p className="text-slate-500 font-semibold">Điểm</p>
+                    <p className="">{student?.points}</p>
                   </div>
                 </div>
               </div>
@@ -184,31 +81,23 @@ export default function DashDetailCustomer() {
           {/* DETAIL */}
           <div className="mt-6">
             <div className="border-b py-2">
-              <h1 className="text-lg font-semibold">Details</h1>
+              <h1 className="text-lg font-semibold">Chi tiết</h1>
             </div>
             <div className="mt-2 *:text-sm space-y-1">
               <div className="">
                 <span className="font-semibold mr-2">Phone:</span>
-                <span>{student.phone}</span>
+                <span>{student?.phone}</span>
               </div>
               <div className="">
                 <span className="font-semibold mr-2">Email:</span>
-                <span>{student.email}</span>
-              </div>
-              <div className="">
-                <span className="font-semibold mr-2">Address:</span>
-                <span>{student.address}</span>
-              </div>
-              <div className="">
-                <span className="font-semibold mr-2">Status:</span>
-                <span>Active</span>
+                <span>{student?.email}</span>
               </div>
             </div>
           </div>
 
           {/* ACTIONS */}
           <div className="">
-            <Button className="mt-4 w-full bg-slate-600">Edit Customer</Button>
+            <Button className="mt-4 w-full bg-slate-600">Chỉnh sửa</Button>
           </div>
         </div>
 
@@ -223,10 +112,10 @@ export default function DashDetailCustomer() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <p className="text-slate-500 font-semibold">
-                    Account Balance
+                    Tài khoản thanh toán
                   </p>
-                  <p className="">${student.wallet.balance} Credit Left</p>
-                  <p>Account balance for next purchase</p>
+                  <p className="">${student?.wallet?.balance} còn lại</p>
+                  <p>Số dư tài khoản cho lần mua hàng tiếp theo</p>
                 </div>
               </div>
 
@@ -239,12 +128,11 @@ export default function DashDetailCustomer() {
                   <p className="text-slate-500 font-semibold">Wishlist</p>
                   <p className="">
                     <span className="font-semibold">
-                      {" "}
-                      {student.wishlist.length}
-                    </span>{" "}
-                    Items in wishlist
+                      {student?.wishlist?.length}
+                    </span>
+                    món ăn yêu thích
                   </p>
-                  <p>Receive notifications on price drops</p>
+                  <p>Nhận thông báo khi giảm giá</p>
                 </div>
               </div>
             </div>
@@ -256,12 +144,12 @@ export default function DashDetailCustomer() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <p className="text-slate-500 font-semibold">
-                    Loyalty Program
+                    Chương trình khách hàng thân thiết
                   </p>
                   <p className=" w-fit  p-1  rounded-md text-lime-600 font-semibold text-sm bg-lime-50 border border-lime-600">
-                    Platinum member
+                    {student?.tier}
                   </p>
-                  <p>3000 points to next tier</p>
+                  <p>100 điểm để lên hạng</p>
                 </div>
               </div>
 
@@ -274,11 +162,11 @@ export default function DashDetailCustomer() {
                   <p className="text-slate-500 font-semibold">Coupons</p>
                   <p className="">
                     <span className="font-semibold">
-                      {student.coupons.length}
-                    </span>{" "}
-                    Coupons you win
+                      {student?.coupons?.length}
+                    </span>
+                    Phiếu giảm giá bạn giành được
                   </p>
-                  <p>Use coupon on next purchase</p>
+                  <p>Sử dụng phiếu giảm giá cho lần mua hàng tiếp theo</p>
                 </div>
               </div>
             </div>
@@ -287,7 +175,7 @@ export default function DashDetailCustomer() {
           {/* ORDERS PLACED */}
           <div className="w-full mt-8 p-4 bg-white rounded-md shadow-md">
             <div className="flex justify-between items-center">
-              <h1>Orders Placed</h1>
+              <h1>Đơn hàng đã đặt</h1>
               <TextInput placeholder="Search Order" />
             </div>
 
@@ -296,23 +184,25 @@ export default function DashDetailCustomer() {
               <Table striped>
                 <Table.Head>
                   <Table.HeadCell>Order ID</Table.HeadCell>
-                  <Table.HeadCell>Date</Table.HeadCell>
-                  <Table.HeadCell>Amount</Table.HeadCell>
-                  <Table.HeadCell>Status</Table.HeadCell>
+                  <Table.HeadCell>Ngày đặt</Table.HeadCell>
+                  <Table.HeadCell>Tổng tiền</Table.HeadCell>
+                  <Table.HeadCell>Trạng thái</Table.HeadCell>
                   <Table.HeadCell>Actions</Table.HeadCell>
                 </Table.Head>
                 <Table.Body className="divide-y">
-                  {student.orders.map((order) => (
-                    <Table.Row key={order.id}>
-                      <Table.Cell>{order.id}</Table.Cell>
-                      <Table.Cell>{order.date}</Table.Cell>
-                      <Table.Cell>${order.total}</Table.Cell>
+                  {student?.orders?.map((order) => (
+                    <Table.Row key={order._id}>
+                      <Table.Cell>{order._id}</Table.Cell>
+                      <Table.Cell>
+                        {formatCreatedAt(order.createdAt)}
+                      </Table.Cell>
+                      <Table.Cell>{order.amount.toLocaleString()}đ</Table.Cell>
                       <Table.Cell>
                         <span
                           className={`${
                             order.status === "Delivered"
-                              ? "bg-lime-100 text-lime-600"
-                              : "bg-red-100 text-red-600"
+                              ? "bg-red-100 text-red-600"
+                              : "bg-lime-100 text-lime-600"
                           } p-1 rounded-md`}
                         >
                           {order.status}

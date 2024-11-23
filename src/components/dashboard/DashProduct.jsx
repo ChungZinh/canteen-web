@@ -1,11 +1,19 @@
-import { Button, Pagination, Spinner, Table } from "flowbite-react";
+import { Button, Dropdown, Pagination, Spinner, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { HiPlus } from "react-icons/hi";
+import { HiCalendar, HiPlus } from "react-icons/hi";
 import foodApi from "../../api/foodApi";
 import { toast, ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { buildQueryString } from "../../utils/buildQueryString";
+import {
+  MdCancel,
+  MdCheckCircle,
+  MdModeEdit,
+  MdMoreVert,
+} from "react-icons/md";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
+import { LuEye } from "react-icons/lu";
 
 export default function DashProduct() {
   const [products, setProducts] = useState([]);
@@ -68,21 +76,27 @@ export default function DashProduct() {
     <div className="h-screen w-full bg-slate-200 p-6">
       <div className="flex items-center justify-between">
         <div className="">
-          <h1 className="text-3xl font-semibold ">Products</h1>
-          <p className="text-slate-500">Manage your products here</p>
+          <h1 className="text-3xl font-semibold ">Danh sách món ăn</h1>
+          <p className="text-slate-500">Danh sách món ăn hiện có</p>
         </div>
         <div className="flex gap-2 items-center">
           <Button className="mt-4 bg-slate-600">
+            <Link to={`/dashboard?tab=calendar`} className="flex">
+              <HiCalendar size={20} />
+              <span className="ml-2">Lịch theo ngày</span>
+            </Link>
+          </Button>
+          <Button className="mt-4 bg-slate-600">
             <Link to={`/dashboard?tab=addProducts`} className="flex">
               <HiPlus size={20} />
-              <span className="ml-2">Add Product</span>
+              <span className="ml-2">Thêm món ăn</span>
             </Link>
           </Button>
 
           <Button className="mt-4 bg-slate-600">
             <Link to={`/dashboard?tab=addCategory`} className="flex">
               <HiPlus size={20} />
-              <span className="ml-2">Add Category</span>
+              <span className="ml-2">Thêm loại món ăn</span>
             </Link>
           </Button>
         </div>
@@ -96,11 +110,12 @@ export default function DashProduct() {
           <div className="mt-8">
             <Table striped>
               <Table.Head>
-                <Table.HeadCell>Product name</Table.HeadCell>
-                <Table.HeadCell>Image</Table.HeadCell>
-                <Table.HeadCell>Category</Table.HeadCell>
-                <Table.HeadCell>Price</Table.HeadCell>
-                <Table.HeadCell>Quantity</Table.HeadCell>
+                <Table.HeadCell>Tên món ăn</Table.HeadCell>
+                <Table.HeadCell>Hình ảnh</Table.HeadCell>
+                <Table.HeadCell>Loại món ăn</Table.HeadCell>
+                <Table.HeadCell>Giá</Table.HeadCell>
+                <Table.HeadCell>Số lượng</Table.HeadCell>
+                <Table.HeadCell>isSoldOut</Table.HeadCell>
                 <Table.HeadCell>Actions</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
@@ -118,43 +133,72 @@ export default function DashProduct() {
                     </Table.Cell>
                     <Table.Cell>{product.category.name}</Table.Cell>
                     <Table.Cell>{product.price}</Table.Cell>
-                    <Table.Cell>{product.quantity}</Table.Cell>
+                    <Table.Cell>{product.stock}</Table.Cell>
                     <Table.Cell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          className="bg-slate-600"
-                          onClick={() => {
-                            navigate(`/dashboard?tab=addProducts`, {
-                              state: { product },
-                            });
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          className={`bg-${
-                            product.isSoldOut ? "green" : "red"
-                          }-500`}
-                          onClick={() =>
-                            product.isSoldOut
-                              ? handleAvailable(product._id)
-                              : handleSetSoldOut(product._id)
-                          }
-                        >
-                          {product.isSoldOut ? "Available" : "Sold Out"}
-                        </Button>
-                      </div>
+                      <span
+                        className={`${
+                          product.isSoldOut
+                            ? "bg-red-100 text-red-600"
+                            : "bg-lime-100 text-lime-600"
+                        } p-1 rounded-md`}
+                      >
+                        {product.isSoldOut ? "Đã hết" : "Còn"}
+                      </span>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Dropdown
+                        arrowIcon={false}
+                        inline
+                        label={
+                          <MdMoreVert size={20} className="text-slate-500" />
+                        }
+                      >
+                        <Dropdown.Item>
+                          <div
+                            onClick={() => {
+                              navigate(`/dashboard?tab=addProducts`, {
+                                state: { product },
+                              });
+                            }}
+                            className="flex items-center"
+                          >
+                            <MdModeEdit size={20} />
+                            <span className="ml-2">Chỉnh sửa</span>
+                          </div>
+                        </Dropdown.Item>
+                        <Dropdown.Item>
+                          <div
+                            onClick={
+                              product.isSoldOut
+                                ? () => handleAvailable(product._id)
+                                : () => handleSetSoldOut(product._id)
+                            }
+                            className="flex items-center"
+                          >
+                            {product.isSoldOut ? (
+                              <MdCheckCircle size={20} />
+                            ) : (
+                              <MdCancel size={20} />
+                            )}
+                            <span className="ml-2">
+                              {product.isSoldOut ? "Còn" : "Hết"}
+                            </span>
+                          </div>
+                        </Dropdown.Item>
+                      </Dropdown>
                     </Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table>
             <div className="">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              )}
             </div>
           </div>
         )}

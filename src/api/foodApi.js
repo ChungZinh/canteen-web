@@ -6,11 +6,15 @@ const foodApi = {
     return axiosClient.get(url);
   },
 
+  getStatistics() {
+    const url = "/foods/statistics";
+    return axiosClient.get(url);
+  },
+
   getTop10SellingProducts() {
     const url = "/foods/top-selling";
     return axiosClient.get(url);
   },
-
 
   create(data, currentUser, accessToken) {
     const url = "/foods";
@@ -34,22 +38,30 @@ const foodApi = {
 
   soldOut(id, currentUser, accessToken) {
     const url = `/foods/sold-out/${id}`;
-    return axiosClient.delete(url, null, {
-      headers: {
-        "x-client-id": currentUser?._id,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    return axiosClient.put(
+      url,
+      {}, // Empty body (no payload)
+      {
+        headers: {
+          "x-client-id": currentUser?._id,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   },
 
   available(id, currentUser, accessToken) {
     const url = `/foods/available/${id}`;
-    return axiosClient.delete(url, null, {
-      headers: {
-        "x-client-id": currentUser?._id,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    return axiosClient.put(
+      url,
+      {}, // Empty body (no payload)
+      {
+        headers: {
+          "x-client-id": currentUser?._id,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   },
 
   getFood(id, currentUser, accessToken) {

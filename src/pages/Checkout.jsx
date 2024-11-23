@@ -32,25 +32,24 @@ export default function Checkout() {
   };
 
   const handleApplyDiscount = async () => {
-    try {
-      setLoading(true);
-      const response = await discountApi.use(
-        {
-          code: discountCode,
-          cartItems: cart,
-        },
-        currentUser,
-        accessToken
-      );
-      if (response.data) {
-        setDiscountAmount(response.data.discountAmount);
-        setFinalTotal(response.data.finalTotal);
-        setLoading(false);
-        toast.success(response.message);
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi áp dụng mã giảm giá!");
+    setLoading(true);
+    const response = await discountApi.use(
+      {
+        code: discountCode,
+        cartItems: cart,
+      },
+      currentUser,
+      accessToken
+    );
+
+    if (response.code === 500) {
+      toast.error(response.message);
       setLoading(false);
+    } else {
+      setDiscountAmount(response.data.discountAmount);
+      setFinalTotal(response.data.finalTotal);
+      setLoading(false);
+      toast.success(response.message);
     }
   };
 
@@ -70,10 +69,10 @@ export default function Checkout() {
       </div>
 
       <div className="max-w-screen-xl mx-auto">
-        <div className="flex mb-8">
-          <div className="w-1/2 pr-12 border-r">
+        <div className="flex mb-8 flex-col lg:flex-row xl:flex-row  justify-center items-center gap-4">
+          <div className="lg:w-1/2 xl:w-1/2 w-full lg:pr-12 xl:pr-12 p-2  border-r">
             {tabFromUrl === "2" ? (
-              <>
+              <div>
                 <h1 className="text-xl font-semibold">
                   Phương thức thanh toán
                 </h1>
@@ -102,11 +101,13 @@ export default function Checkout() {
                   </Button>
                   <Button className="bg-slate-500">Hoàn tất đơn hàng</Button>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
-                <h1 className="text-xl font-semibold">Thông tin khách hàng</h1>
-                <div className="mt-4 space-y-4 mb">
+              <div className="">
+                <h1 className="text-xl font-semibold text-center">
+                  Thông tin khách hàng
+                </h1>
+                <div className="mt-4 space-y-4 ">
                   <FloatingLabel
                     variant="outlined"
                     label="Họ và tên"
@@ -122,7 +123,7 @@ export default function Checkout() {
                     label="Email"
                     onChange={handleChange}
                   />
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between gap-2 items-center">
                     <Button color="light">
                       <div className="flex items-center gap-2">
                         <HiArrowLeft className="h-4 w-4" />
@@ -147,11 +148,11 @@ export default function Checkout() {
                     </Button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
 
-          <div className="w-1/2 pl-12">
+          <div className="lg:w-1/2 xl:w-1/2 w-full xl:pl-12 lg:pl-12 p-2">
             {/* LIST PRODUCT */}
             <div className="space-y-4 border-b pb-4">
               {cart.map((product) => (

@@ -10,6 +10,7 @@ import DashListOrder from "../components/dashboard/DashListOrders";
 import DashDetailOrder from "../components/dashboard/DashDetailOrder";
 import DashListDiscount from "../components/dashboard/DashListDiscount";
 import DashAddDiscount from "../components/dashboard/DashAddDiscount";
+import DashCalendarFood from "../components/dashboard/DashCalendarFood";
 export default function Dashboard() {
   const location = useLocation();
   const [tab, setTab] = useState("");
@@ -37,6 +38,7 @@ export default function Dashboard() {
       {tab === "listDiscounts" && <DashListDiscount />}
       {tab === "addDiscount" && <DashAddDiscount />}
       {tab === "editDiscount" && <DashAddDiscount />}
+      {tab === "calendar" && <DashCalendarFood />}
     </div>
   );
 }

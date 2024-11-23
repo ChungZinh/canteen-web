@@ -1,4 +1,4 @@
-import { Dropdown, Spinner, Table } from "flowbite-react";
+import { Button, Dropdown, Spinner, Table } from "flowbite-react";
 import { useEffect, useState } from "react";
 import discountApi from "../../api/discountApi";
 import { useSelector } from "react-redux";
@@ -53,6 +53,13 @@ export default function DashListDiscount() {
           <h1 className="text-3xl font-semibold ">Danh sách mã giảm giá</h1>
           <p className="text-slate-500">Danh sách mã giảm giá</p>
         </div>
+        <Button
+          onClick={() => {
+            navigate(`/dashboard?tab=addDiscount`);
+          }}
+        >
+          Thêm mã giảm giá
+        </Button>
       </div>
 
       {/* TABLE */}
@@ -124,7 +131,8 @@ export default function DashListDiscount() {
                               state: { discount },
                             });
                           }}
-                        className="flex items-center">
+                          className="flex items-center"
+                        >
                           <LuEye size={20} />
                           <span className="ml-2">Edit</span>
                         </div>

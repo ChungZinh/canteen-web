@@ -9,39 +9,58 @@ import foodApi from "../api/foodApi";
 import { buildQueryString } from "../utils/buildQueryString";
 import { categories } from "../constants/categories";
 import categoryApi from "../api/categoryApi";
+import menuApi from "../api/menuApi";
 
 export default function Product() {
-  const [query, setQuery] = useState({ all: true });
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  // Lấy ngày hiện tại
+  const getCurrentDay = () => {
+    const currentDate = new Date();
+    return daysOfWeek[currentDate.getDay()]; // Trả về tên ngày hiện tại
+  };
+  const [query, setQuery] = useState({ all: true, isSoldOut: false });
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [selectCategory, setSelectCategory] = useState("Tất cả");
   const [categories, setCategories] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(getCurrentDay()); // Ngày mặc định là ngày hiện tại
+
   useEffect(() => {
+    // const fetchFoods = async () => {
+    //   const queryB = buildQueryString(query);
+    //   const response = await foodApi.getAllFoods(queryB);
+    //   if (response.data) {
+    //     setProducts(response.data.foods);
+    //     setLoading(false);
+    //   } else {
+    //     toast.error("Failed to fetch foods");
+    //     setLoading(false);
+    //   }
+    // };
     setLoading(true);
-    const fetchFoods = async () => {
+    const fetchMenuForDay = async () => {
       const queryB = buildQueryString(query);
-      const response = await foodApi.getAllFoods(queryB);
+      const response = await menuApi.getMenuForDay(selectedDay, queryB);
       if (response.data) {
         setProducts(response.data.foods);
         setLoading(false);
-      } else {
-        toast.error("Failed to fetch foods");
-        setLoading(false);
+      }else{
+        setProducts([]);
       }
-    };
 
-    const fetchFoodsTop = async () => {
-      const response = await foodApi.getTop10SellingProducts();
-      if (response.data) {
-        setTopProducts(response.data);
-        setLoading(false);
-      } else {
-        toast.error("Failed to fetch top foods");
-        setLoading(false);
-      }
     };
+    fetchMenuForDay();
 
     const fetchCategories = async () => {
       const response = await categoryApi.getAll();
@@ -55,14 +74,13 @@ export default function Product() {
     };
 
     fetchCategories();
-    fetchFoodsTop();
-    fetchFoods();
-  }, [currentUser?._id, query]);
+    // fetchFoods();
+  }, [currentUser?._id, query, selectedDay]);
 
   const handleFilter = (category) => {
     setSelectCategory(category.name);
     if (category === "Tất cả") {
-      setQuery({ all: true });
+      setQuery({ all: true});
     } else {
       setQuery({ category: category._id });
     }

@@ -11,11 +11,19 @@ import { useLocation } from "react-router-dom";
 export default function FooterC() {
   const location = useLocation();
 
+  // List of routes where footer should not appear
+  const hiddenRoutes = [
+    "/dashboard",
+    "/chef-dashboard",
+    "/complete-order"
+  ];
+
+  // Check if the current path is in the list of hidden routes or has the dynamic part
+  const isHiddenRoute = hiddenRoutes.some(route => location.pathname.startsWith(route));
+
   return (
     <>
-      {location.pathname === "/dashboard" ? (
-        ""
-      ) : (
+      {!isHiddenRoute && (
         <Footer>
           <div className="w-full bg-slate-200 border-t border-slate-400">
             <div className="grid max-w-screen-2xl mx-auto grid-cols-2 gap-8 px-6 py-8 md:grid-cols-4">

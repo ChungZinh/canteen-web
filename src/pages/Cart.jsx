@@ -44,8 +44,6 @@ export default function Cart() {
     }
   };
 
-
-
   return (
     <div className="overflow-x-hidden">
       <div
@@ -67,7 +65,7 @@ export default function Cart() {
           <p>Có {totalItems} sản phẩm trong giỏ hàng</p>
           <div className="w-[200px] h-[2px] bg-slate-600"></div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col lg:flex-row xl:flex-row  justify-center items-center gap-4 mb-10">
           <div className="w-3/4">
             {/* LIST PRODUCT */}
             <div className="border-r pr-4">
@@ -86,17 +84,19 @@ export default function Cart() {
               )}
             </div>
             {/* NOTE */}
-            <div className="mt-4 mb-8 space-y-2">
-              <p>Ghi chú đơn hàng</p>
-              <Textarea
-                placeholder="Nhập ghi chú"
-                rows={6}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-              />
-            </div>
+            {cart.length > 0 ? (
+              <div className="mt-4 mb-8 space-y-2">
+                <p>Ghi chú đơn hàng</p>
+                <Textarea
+                  placeholder="Nhập ghi chú"
+                  rows={6}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </div>
+            ) : null}
           </div>
-          <div className="w-1/4">
+          <div className="lg:w-1/4 xl:w-1/4 w-3/4">
             <div className="border px-4">
               <div className="border-b py-4">
                 <h1 className="text-xl font-semibold">Thông tin đơn hàng</h1>

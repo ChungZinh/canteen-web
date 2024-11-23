@@ -69,8 +69,8 @@ export default function Checkout() {
       </div>
 
       <div className="max-w-screen-xl mx-auto">
-        <div className="flex mb-8">
-          <div className="w-1/2 pr-12 border-r">
+        <div className="flex mb-8 flex-col lg:flex-row xl:flex-row  justify-center items-center gap-4">
+          <div className="lg:w-1/2 xl:w-1/2 w-full lg:pr-12 xl:pr-12 p-2  border-r">
             <h1 className="text-xl font-semibold">Phương thức thanh toán</h1>
             <div className="space-y-1 mt-4">
               <PaymentOption
@@ -107,7 +107,7 @@ export default function Checkout() {
             </div>
           </div>
 
-          <div className="w-1/2 pl-12">
+          <div className="lg:w-1/2 xl:w-1/2 w-full xl:pl-12 lg:pl-12 p-2">
             {/* LIST PRODUCT */}
             <div className="space-y-4 border-b pb-4">
               {cart.map((product) => (

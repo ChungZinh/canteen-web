@@ -1,10 +1,4 @@
-import {
-  Button,
-  Dropdown,
-  Pagination,
-  Table,
-  TextInput,
-} from "flowbite-react";
+import { Button, Dropdown, Pagination, Table, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { BiExport } from "react-icons/bi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
@@ -78,8 +72,8 @@ export default function DashListOrders() {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold ">List Orders</h1>
-          <p className="text-slate-500">List of all orders</p>
+          <h1 className="text-3xl font-semibold ">Danh sách đơn hàng</h1>
+          <p className="text-slate-500">Quản lý đơn hàng của khách hàng</p>
         </div>
       </div>
 
@@ -87,7 +81,7 @@ export default function DashListOrders() {
       <div className="bg-white rounded-md shadow-md mt-4">
         <div className="flex py-2 px-4 justify-between items-center">
           <div className="">
-            <TextInput placeholder="Search orders" className="w-full" />
+            <TextInput placeholder="Tìm kiếm..." className="w-full" />
           </div>
           <Button className="flex items-center ">
             <BiExport size={20} />
@@ -96,11 +90,11 @@ export default function DashListOrders() {
         </div>
         <Table striped>
           <Table.Head>
-            <Table.HeadCell>Customer</Table.HeadCell>
-            <Table.HeadCell>Date</Table.HeadCell>
-            <Table.HeadCell>Amount</Table.HeadCell>
-            <Table.HeadCell>Status</Table.HeadCell>
-            <Table.HeadCell>Method</Table.HeadCell>
+            <Table.HeadCell>Khách hàng</Table.HeadCell>
+            <Table.HeadCell>Ngày đặt</Table.HeadCell>
+            <Table.HeadCell>Tổng tiền</Table.HeadCell>
+            <Table.HeadCell>Trạng thái</Table.HeadCell>
+            <Table.HeadCell>Phương thức thanh toán</Table.HeadCell>
             <Table.HeadCell>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
@@ -109,14 +103,14 @@ export default function DashListOrders() {
                 <Table.Cell>
                   <div className="flex items-center">
                     <img
-                      src={order.user.avatar}
+                      src={order?.user?.avatar}
                       alt="avatar"
                       className="h-10 w-10 rounded-full border"
                     />
                     <div className="ml-2 space-y-1">
-                      <p className="font-semibold">{order.user.fullName}</p>
+                      <p className="font-semibold">{order?.user?.fullName}</p>
                       <p className="text-slate-500 text-xs">
-                        {order.user.email}
+                        {order?.user?.email}
                       </p>
                     </div>
                   </div>
@@ -128,7 +122,10 @@ export default function DashListOrders() {
                   <span
                     className={`${
                       order.status === "Đã đặt" ||
-                      order.status === "Đã thanh toán"
+                      order.status === "Đã thanh toán" ||
+                      order.status === "Đang chuẩn bị" ||
+                      order.status === "Đã chuẩn bị" ||
+                      order.status === "Đã hoàn tất"
                         ? "bg-lime-100 text-lime-600"
                         : "bg-red-100 text-red-600"
                     } p-1 rounded-md`}
@@ -171,11 +168,13 @@ export default function DashListOrders() {
       </div>
       <div className=" p-2 flex justify-between">
         <div className="">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          )}
         </div>
       </div>
     </div>
