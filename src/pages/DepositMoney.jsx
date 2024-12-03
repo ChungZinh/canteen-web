@@ -6,16 +6,19 @@ import { useSelector } from "react-redux";
 import { buildQueryString } from "../utils/buildQueryString";
 import { toast } from "react-toastify";
 import { generatePaymentQR } from "../utils/generatePaymentQR";
+import PaymentOption from "../components/PaymentOption";
 
 export default function DepositMoney() {
   const [user, setUser] = useState({});
   const { currentUser } = useSelector((state) => state.user);
-  const accessToken = localStorage.getItem("accessToken");
   const [query, setQuery] = useState("");
   const [amount, setAmount] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [qrCode, setQrCode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("ZaloPay"); // Default payment method
+  const accessToken = localStorage.getItem("accessToken");
+
   useEffect(() => {
     const fetchUser = async () => {
       const queryB = buildQueryString(query);
@@ -53,6 +56,28 @@ export default function DepositMoney() {
     setQrCode(qrCode);
 
     setOpenModal(true);
+  };
+
+  const handleDeposit = async () => {
+    try {
+      const data = {
+        userId: currentUser._id,
+        amount: amount,
+        paymentMethod: paymentMethod,
+      };
+      const response = await userApi.deposit(data, currentUser, accessToken);
+      if (response.data && response.data.paymentUrl) {
+        window.location.replace(response.data.paymentUrl);
+      } else {
+        // Handle the case where orderUrl is not present
+        toast.error(
+          "Đã tạo yêu cầu nạp tiền, nhưng không tìm thấy liên kết thanh toán!"
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Có lỗi xảy ra khi nap tien!");
+    }
   };
 
   return (
@@ -104,9 +129,26 @@ export default function DepositMoney() {
           </div>
         </div>
 
-        <div className="mt-10 border-t pt-6">
+        <div className="space-y-1 mt-4">
+          <PaymentOption
+            id="zalo"
+            label="Thanh toán qua ZaloPay"
+            imageUrl="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay.png"
+            isSelected={paymentMethod === "ZaloPay"}
+            onSelect={() => setPaymentMethod("ZaloPay")}
+          />
+          <PaymentOption
+            id="momo"
+            label="Thanh toán qua MoMo"
+            imageUrl="https://imgs.search.brave.com/KY5s3Gb9IFeHJMoLPyU9n4F_7RNzno1vVHNbgTBN1MY/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9kZXZl/bG9wZXJzLm1vbW8u/dm4vdjMvYXNzZXRz/L2ltYWdlcy9wcmlt/YXJ5LW1vbW8tZGRk/NjYyYjA5ZTk0ZDg1/ZmFjNjllMjQ0MzFm/ODczNjUucG5n"
+            isSelected={paymentMethod === "MoMo"}
+            onSelect={() => setPaymentMethod("MoMo")}
+          />
+        </div>
+
+        <div className="mt-4 border-t pt-6">
           <Button
-            onClick={() => generateQRCode()}
+            onClick={() => handleDeposit()}
             className="w-full bg-blue-500 text-white"
           >
             Nạp tiền

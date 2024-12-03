@@ -113,7 +113,9 @@ export default function DashListDiscount() {
                   </Table.Cell>
                   <Table.Cell>
                     <span className="text-slate-500">
-                      {discount.applicableProducts.length}
+                      {discount.applicableProducts.length === 0
+                        ? "Tất cả"
+                        : discount.applicableProducts.length}
                     </span>
                   </Table.Cell>
                   <Table.Cell>

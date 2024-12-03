@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import userApi from "../api/userApi";
 import { buildQueryString } from "../utils/buildQueryString";
 import { useNavigate } from "react-router-dom";
+import { CgEditBlackPoint } from "react-icons/cg";
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -22,6 +23,7 @@ export default function Profile() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+  const [ordersCompleted, setOrdersCompleted] = useState([]);
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [transaction, setTransaction] = useState([]);
@@ -43,36 +45,14 @@ export default function Profile() {
       );
       setUser(response.data.user);
       setTransaction(response.data.user?.wallet?.transactions);
-      setOrders(response.data.orders);
+      setOrders(response.data.ordersInProgress);
+      setOrdersCompleted(response.data.ordersCompleted);
       setTotalPages(response.data.totalPages);
     };
     fetchUser();
   }, [currentUser, accessToken, page, query]);
 
-  console.log("user", user);
-  const wallet = {
-    balance: 70000,
-    transaction: [
-      {
-        id: 1,
-        amount: 10000,
-        date: "2022-10-10",
-        description: "Nạp tiền vào ví",
-      },
-      {
-        id: 2,
-        amount: -15000,
-        date: "2022-10-11",
-        description: "Mua mì tôm",
-      },
-      {
-        id: 3,
-        amount: -15000,
-        date: "2022-10-12",
-        description: "Mua coca cola",
-      },
-    ],
-  };
+console.log(user)
 
   return (
     <div className="overflow-x-hidden">
@@ -104,8 +84,14 @@ export default function Profile() {
                   </p>
                 </div>
               </div>
-              <div className="">
+              <div className="flex items-center gap-4">
                 {/* POINT */}
+                <div className="flex items-center gap-2 mr-4">
+                  <CgEditBlackPoint className="h-6 w-6" />
+                  <span className="text-lg font-bold">
+                  Điểm: {user?.points || 0}
+                  </span>
+                </div>  
                 <div className="flex items-center gap-4 bg-slate-200 p-2 rounded-md border">
                   <div className="flex items-center gap-2">
                     <TbCoin className="h-6 w-6" />
@@ -125,8 +111,8 @@ export default function Profile() {
           </div>
         </Card>
 
-        <div className="mt-8 flex gap-8">
-          <Card className="w-1/3">
+        <div className="mt-8 flex xl:flex-row lg:flex-row flex-col gap-8">
+          <Card className="lg:w-1/3 xl:w-1/3 w-full">
             <h1 className="text-2xl font-bold border-b pb-4">
               Thông tin cá nhân
             </h1>
@@ -152,7 +138,7 @@ export default function Profile() {
               </div>
             </div>
           </Card>
-          <Card className="w-2/3 h-fit">
+          <Card className="lg:w-2/3 xl:w-2/3 w-full">
             <h1 className="text-2xl font-bold border-b pb-4">
               Lịch sử giao dịch
             </h1>
@@ -166,13 +152,13 @@ export default function Profile() {
                   <Table.Head>
                     <Table.HeadCell>STT</Table.HeadCell>
                     <Table.HeadCell>Số tiền</Table.HeadCell>
-                    <Table.HeadCell>Ngày</Table.HeadCell>
-                    <Table.HeadCell>Mô tả</Table.HeadCell>
+                    <Table.HeadCell>Phương thức thanh toán</Table.HeadCell>
+                    <Table.HeadCell>Trạng thái</Table.HeadCell>
                   </Table.Head>
                   <Table.Body>
-                    {transaction?.map((item) => (
-                      <Table.Row key={item.id}>
-                        <Table.Cell>{item.id}</Table.Cell>
+                    {transaction?.map((item, index) => (
+                      <Table.Row key={item._id}>
+                        <Table.Cell>{index + 1}</Table.Cell>
                         <Table.Cell>
                           {item.amount > 0 ? (
                             <Badge color="success">
@@ -180,12 +166,12 @@ export default function Profile() {
                             </Badge>
                           ) : (
                             <Badge color="failure">
-                              {item.amount.toLocaleString()}đ
+                              {item?.amount?.toLocaleString()}đ
                             </Badge>
                           )}
                         </Table.Cell>
-                        <Table.Cell>{item.date}</Table.Cell>
-                        <Table.Cell>{item.description}</Table.Cell>
+                        <Table.Cell>{item.payMethod}</Table.Cell>
+                        <Table.Cell>{item.transactionStatus}</Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>
@@ -195,8 +181,120 @@ export default function Profile() {
           </Card>
         </div>
 
-        <div className="mt-8 mb-8">
+        <div className="mt-8 mb-8 overflow-x-auto">
           {orders?.length === 0 ? (
+            <Card className="w-full">
+              <h1 className="text-2xl font-bold border-b pb-4">
+                Đơn hàng đang xử lý
+              </h1>
+              <div className="flex justify-center items-center h-[200px]">
+                <p>Không có dữ liệu</p>
+              </div>
+            </Card>
+          ) : (
+            <Card className="w-full">
+              <h1 className="text-2xl font-bold border-b pb-4">
+                Đơn hàng đang xử lý
+              </h1>
+              <div className="">
+                <div className="">
+                  <Table striped>
+                    <Table.Head>
+                      <Table.HeadCell>STT</Table.HeadCell>
+                      <Table.HeadCell>Ngày</Table.HeadCell>
+                      <Table.HeadCell style={{ width: "20%" }}>
+                        Trạng thái
+                      </Table.HeadCell>
+                      <Table.HeadCell>Chi tiết đơn hàng</Table.HeadCell>
+                    </Table.Head>
+                    <Table.Body>
+                      {orders?.map((order, index) => (
+                        <Table.Row key={order._id}>
+                          <Table.Cell>{index + 1}</Table.Cell>
+                          <Table.Cell>
+                            {formatCreatedAt(order.createdAt)}
+                          </Table.Cell>
+                          <Table.Cell>
+                            <span
+                              className={`${
+                                order.status === "Đã đặt" ||
+                                order.status === "Đã thanh toán" ||
+                                order.status === "Đang chuẩn bị" ||
+                                order.status === "Đã chuẩn bị" ||
+                                order.status === "Đã hoàn tất"
+                                  ? "bg-lime-100 text-lime-600"
+                                  : "bg-red-100 text-red-600"
+                              } p-1 rounded-md`}
+                            >
+                              {order?.status}
+                            </span>
+                          </Table.Cell>
+
+                          <Table.Cell colSpan={3} style={{ width: "80%" }}>
+                            <Accordion style={{ width: "100%" }}>
+                              <Accordion.Panel>
+                                <Accordion.Title>
+                                  Chi tiết đơn hàng
+                                </Accordion.Title>
+                                <Accordion.Content>
+                                  {order.foods.map((food) => (
+                                    <div className="" key={food._id}>
+                                      <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-16 h-16 border p-2 rounded-md relative object-contain">
+                                            <img
+                                              src={food.image}
+                                              className=" object-contain h-full w-full"
+                                            />
+                                            <div className="h-[20px] w-[20px] -top-2 -right-3 flex justify-center items-center font-semibold bg-slate-200 absolute rounded-full text-sm ">
+                                              <p className="text-slate-600">
+                                                {food.quantity}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <h1>
+                                            <p className="font-semibold">
+                                              {food.name}
+                                            </p>
+                                          </h1>
+                                        </div>
+
+                                        <div className="">
+                                          <p>
+                                            {(
+                                              food.quantity * food.price
+                                            ).toLocaleString()}
+                                            ₫
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </Accordion.Content>
+                              </Accordion.Panel>
+                            </Accordion>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table>
+                </div>
+                <div className="mt-8 ">
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                    />
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        <div className="mt-8 mb-8 overflow-x-auto">
+          {ordersCompleted?.length === 0 ? (
             <Card className="w-full">
               <h1 className="text-2xl font-bold border-b pb-4">
                 Lịch sử mua hàng
@@ -222,7 +320,7 @@ export default function Profile() {
                       <Table.HeadCell>Chi tiết đơn hàng</Table.HeadCell>
                     </Table.Head>
                     <Table.Body>
-                      {orders?.map((order, index) => (
+                      {ordersCompleted?.map((order, index) => (
                         <Table.Row key={order._id}>
                           <Table.Cell>{index + 1}</Table.Cell>
                           <Table.Cell>

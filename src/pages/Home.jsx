@@ -94,45 +94,6 @@ export default function Home() {
     };
     fetchMenuForDay();
 
-    // const fetchFoods = async () => {
-    //   const queryB = buildQueryString(query);
-    //   const response = await foodApi.getAllFoods(queryB);
-    //   if (response.data) {
-    //     setProducts(response.data.foods);
-    //     setLoading(false);
-
-    //     const foods = response.data.foods;
-
-    //     // Khởi tạo các danh sách rỗng
-    //     const mainDishes = [];
-    //     const sideDishes = [];
-    //     const drinks = [];
-
-    //     // Duyệt qua các sản phẩm và phân loại dựa trên category
-    //     foods.forEach((food) => {
-    //       if (
-    //         food.category.name === FOOD_BREAKFAST ||
-    //         food.category.name === FOOD_LUNCH ||
-    //         food.category.name === FOOD_DINNER
-    //       ) {
-    //         mainDishes.push(food);
-    //       } else if (food.category.name === FOOD_DESSERT) {
-    //         sideDishes.push(food);
-    //       } else if (food.category.name === FOOD_DRINK) {
-    //         drinks.push(food);
-    //       }
-    //     });
-
-    //     // Cập nhật state với dữ liệu đã phân loại
-    //     setFoodMain(mainDishes);
-    //     setFoodSide(sideDishes);
-    //     setFoodDrink(drinks);
-    //   } else {
-    //     toast.error("Failed to fetch foods");
-    //     setLoading(false);
-    //   }
-    // };
-
     const fetchFoodsTop = async () => {
       const response = await foodApi.getTop10SellingProducts();
       if (response.data) {

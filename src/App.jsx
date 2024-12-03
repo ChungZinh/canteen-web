@@ -30,6 +30,7 @@ function App() {
           <Route element={<UserRoute />}>
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/checkout" element={<Checkout />} />
           </Route>
           <Route path="/products" element={<Product />} />
           <Route path="/about" element={<About />} />
@@ -37,7 +38,6 @@ function App() {
           <Route path="/complete-order/:id" element={<CompleteOrder />} />
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout-step-2" element={<CheckoutStep2 />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/deposit" element={<DepositMoney />} />

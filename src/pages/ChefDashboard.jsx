@@ -13,9 +13,9 @@ import authApi from "../api/authApi";
 import { signOutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 import orderApi from "../api/orderApi";
-import { formatCreatedAt, timeAgo } from "../utils/formatDate";
+import { timeAgo } from "../utils/formatDate";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
-
+import socket from "../utils/socket";
 export default function ChefDashboard() {
   const { currentUser } = useSelector((state) => state.user);
   const accessToken = localStorage.getItem("accessToken");
@@ -26,8 +26,8 @@ export default function ChefDashboard() {
   const [openModal, setOpenModal] = useState(false);
   const [reason, setReason] = useState("");
   const dispatch = useDispatch();
-  const [selectStatus, setSelectStatus] = useState("Đang chuẩn bị");
-  const status = [ "Đã thanh toán", "Đang chuẩn bị"];
+  const [selectStatus, setSelectStatus] = useState("Đã thanh toán");
+  const status = ["Đã thanh toán", "Đang chuẩn bị"];
   const handleSignOut = async () => {
     // authApi.signOut();
     const refreshToken = localStorage.getItem("refreshToken");
@@ -57,7 +57,30 @@ export default function ChefDashboard() {
       }
     };
     fetchOrders();
+
+    const handleOrderPaid = (newOrder) => {
+      console.log("order_paid", newOrder);
+      setOrders((prev) => [newOrder, ...prev]); // Chỉ thêm order mới
+    };
+
+    socket.on("order_paid", handleOrderPaid);
+
+    return () => {
+      socket.off("order_paid", handleOrderPaid);
+    };
   }, [currentUser, accessToken, isUpdate]);
+
+  // CHECK SOCKET CONNECTION
+  useEffect(() => {
+    console.log("socket", socket);
+  }, []);
+
+  // CHECK LIST ORDER SOCKET
+  useEffect(() => {
+    socket.on("order_paid", (data) => {
+      console.log("order_paid", data);
+    });
+  }, []);
 
   const handleUpdateStatus = async (id, status) => {
     const response = await orderApi.chefUpdateStatus(
@@ -116,7 +139,7 @@ export default function ChefDashboard() {
           className="w-full"
           variant="pills"
           onActiveTabChange={(tab) => setSelectStatus(tab)}
-        > 
+        >
           <Tabs.Item
             key={status[0]}
             active={selectStatus === status[0]}
@@ -222,14 +245,18 @@ const CardOrder = ({
         <div className="w-[280px]">
           <div className="flex items-center gap-2">
             <Avatar
-              img={order.user.avatar}
+              img={order?.user?.avatar}
               rounded
               className="border rounded-full w-fit"
             />
             <div className="">
-              <p className="font-semibold">{order.user.fullName}</p>
+              <p className="font-semibold">
+                {order?.user?.fullName || order?.customerInfo?.fullName}
+              </p>
               {/* <p className="text-sm text-neutral-400">{order.user.email}</p> */}
-              <p className="text-sm text-neutral-400">{order.user.phone}</p>
+              <p className="text-sm text-neutral-400">
+                {order?.user?.phone || order?.customerInfo?.phone}
+              </p>
             </div>
           </div>
         </div>

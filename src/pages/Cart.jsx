@@ -12,6 +12,7 @@ import { useState } from "react";
 
 export default function Cart() {
   // Lấy dữ liệu giỏ hàng từ Redux store
+  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const navigate = useNavigate(); // Hook to navigate to the checkout page
@@ -38,7 +39,15 @@ export default function Cart() {
   const handleCheckout = () => {
     if (cart.length > 0) {
       // Navigate to checkout page and pass the cart data
-      navigate("/checkout", { state: { cart, totalItems, totalPrice, note } });
+      if (currentUser) {
+        navigate("/checkout-step-2", {
+          state: { cart, totalItems, totalPrice, note },
+        });
+      } else {
+        navigate("/checkout", {
+          state: { cart, totalItems, totalPrice, note },
+        });
+      }
     } else {
       alert("Giỏ hàng của bạn đang trống!");
     }
@@ -109,7 +118,6 @@ export default function Cart() {
                 <Button
                   onClick={handleCheckout}
                   className="bg-slate-500 w-full"
-                  href="/checkout"
                 >
                   Thanh toán
                 </Button>

@@ -7,6 +7,8 @@ import ProductCart from "../components/ProductCart";
 import { useLocation, useNavigate } from "react-router-dom";
 import discountApi from "../api/discountApi";
 import { toast } from "react-toastify";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 export default function Checkout() {
   const location = useLocation();
@@ -15,43 +17,70 @@ export default function Checkout() {
   const { cart, totalItems, totalPrice, note } = location.state || {};
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-  });
+
   const accessToken = localStorage.getItem("accessToken");
   const [loading, setLoading] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  // Formik configuration
+  const formik = useFormik({
+    initialValues: {
+      fullName: "",
+      phone: "",
+      email: "",
+    },
+    validationSchema: Yup.object({
+      fullName: Yup.string().required("Họ và tên không được để trống"),
+      phone: Yup.string()
+        .required("Số điện thoại không được để trống")
+        .matches(/^[0-9]{10,11}$/, "Số điện thoại không hợp lệ"),
+      email: Yup.string()
+        .email("Email không hợp lệ")
+        .required("Email không được để trống"),
+    }),
+    onSubmit: (values) => {
+      navigate("/checkout-step-2", {
+        state: {
+          cart,
+          finalTotal,
+          discountAmount,
+          totalPrice,
+          note,
+          customerInfo: { ...values },
+        },
+      });
+    },
+  });
 
   const handleApplyDiscount = async () => {
     setLoading(true);
-    const response = await discountApi.use(
-      {
-        code: discountCode,
-        cartItems: cart,
-      },
-      currentUser,
-      accessToken
-    );
+    try {
+      const response = await discountApi.use(
+        {
+          code: discountCode,
+          cartItems: cart,
+        },
+        currentUser,
+        accessToken
+      );
 
-    if (response.code === 500) {
-      toast.error(response.message);
+      if (response.code === 500) {
+        toast.error(response.message);
+        setLoading(false);
+      } else {
+        setDiscountAmount(response.data.discountAmount);
+        setLoading(false);
+        setFinalTotal(response.data.finalTotal);
+        toast.success(response.message);
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi áp dụng mã giảm giá!");
       setLoading(false);
-    } else {
-      setDiscountAmount(response.data.discountAmount);
-      setFinalTotal(response.data.finalTotal);
-      setLoading(false);
-      toast.success(response.message);
     }
   };
+
 
   return (
     <div className="overflow-x-hidden">
@@ -103,26 +132,65 @@ export default function Checkout() {
                 </div>
               </div>
             ) : (
-              <div className="">
+              <form onSubmit={formik.handleSubmit}>
                 <h1 className="text-xl font-semibold text-center">
                   Thông tin khách hàng
                 </h1>
-                <div className="mt-4 space-y-4 ">
-                  <FloatingLabel
-                    variant="outlined"
-                    label="Họ và tên"
-                    onChange={handleChange}
+                <div className="mt-4 space-y-4">
+                  <TextInput
+                    placeholder="Họ và tên"
+                    name="fullName"
+                    value={formik.values.fullName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    color={
+                      formik.errors.fullName && formik.touched.fullName
+                        ? "failure"
+                        : undefined
+                    }
                   />
-                  <FloatingLabel
-                    variant="outlined"
-                    label="Số điện thoại"
-                    onChange={handleChange}
+                  {formik.touched.fullName && formik.errors.fullName && (
+                    <p className="text-red-500 text-sm">
+                      {formik.errors.fullName}
+                    </p>
+                  )}
+
+                  <TextInput
+                    placeholder="Số điện thoại"
+                    name="phone"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    color={
+                      formik.errors.phone && formik.touched.phone
+                        ? "failure"
+                        : undefined
+                    }
                   />
-                  <FloatingLabel
-                    variant="outlined"
-                    label="Email"
-                    onChange={handleChange}
+                  {formik.touched.phone && formik.errors.phone && (
+                    <p className="text-red-500 text-sm">
+                      {formik.errors.phone}
+                    </p>
+                  )}
+
+                  <TextInput
+                    placeholder="Email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    color={
+                      formik.errors.email && formik.touched.email
+                        ? "failure"
+                        : undefined
+                    }
                   />
+                  {formik.touched.email && formik.errors.email && (
+                    <p className="text-red-500 text-sm">
+                      {formik.errors.email}
+                    </p>
+                  )}
+
                   <div className="flex justify-between gap-2 items-center">
                     <Button color="light">
                       <div className="flex items-center gap-2">
@@ -130,25 +198,12 @@ export default function Checkout() {
                         <span>Giỏ hàng</span>
                       </div>
                     </Button>
-                    <Button
-                      onClick={() => {
-                        navigate("/checkout-step-2", {
-                          state: {
-                            cart,
-                            finalTotal,
-                            discountAmount,
-                            totalPrice,
-                            note,
-                          },
-                        });
-                      }}
-                      className="bg-slate-500"
-                    >
+                    <Button type="submit" className="bg-slate-500">
                       Tiếp tục đến phương thức thanh toán
                     </Button>
                   </div>
                 </div>
-              </div>
+              </form>
             )}
           </div>
 

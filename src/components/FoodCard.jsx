@@ -36,26 +36,25 @@ export default function FoodCard({ size, cart, product }) {
             <p className="text-center inria-sans-bold-italic font-semibold  text-md">
               {product?.name}
             </p>
-            <div className="flex justify-between items-center ">
-              <p className="text-center inria-sans-light-italic text-md">
+            <div
+              className={`flex ${
+                cart && "justify-between"
+              } justify-center mt-2 items-center `}
+            >
+              <p className="text-center  inria-sans-light-italic text-md">
                 Giá: {product?.price.toLocaleString()}đ
               </p>
-              <button
-                onClick={
-                  cart
-                    ? () => handleAddToCart(product)
-                    : () => handleBuyNow(product)
-                }
-                className=" bg-primary-500 text-slate-500 hover:bg-slate-200 duration-200 border font-semibold rounded-lg p-2 mt-2"
-              >
-                {cart ? (
+
+              {cart && (
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className=" bg-primary-500 text-slate-500 hover:bg-slate-200 duration-200 border font-semibold rounded-lg p-2 mt-2"
+                >
                   <div className="flex items-center">
                     <HiPlus className="h-6 w-6" />
                   </div>
-                ) : (
-                  "Mua ngay"
-                )}
-              </button>
+                </button>
+              )}
             </div>
           </div>
         </div>

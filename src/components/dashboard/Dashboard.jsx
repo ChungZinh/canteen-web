@@ -282,16 +282,19 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      <div className="w-1/3 bg-slate-100 p-2 ">
+      <div className="w-1/3 bg-slate-100 p-4 ">
         {/* CHART */}
-        <div>
-          <h1>Dashboard</h1>
+        <div className="flex flex-col h-full justify-between items-center">
           <div style={{ marginBottom: "20px" }}>
-            <h2>So sánh tháng hiện tại và tháng trước</h2>
+            <h2 className="font-semibold  mb-2 text-xl">
+              So sánh tháng hiện tại và tháng trước
+            </h2>
             <OrdersRevenueBarChart data={barChartData} />
           </div>
           <div style={{ marginBottom: "20px" }}>
-            <h2>So sánh doanh thu hiện tại và tháng trước</h2>
+            <h2 className="font-semibold  mb-2 text-xl">
+              So sánh doanh thu hiện tại và tháng trước
+            </h2>
             <OrdersRevenueBarChart data={barChartData1} />
           </div>
         </div>

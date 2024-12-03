@@ -15,7 +15,7 @@ export default function DashListOrders() {
   const { currentUser } = useSelector((state) => state.user);
   const accessToken = localStorage.getItem("accessToken");
   const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState({limit: 15});
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(10);
@@ -103,12 +103,17 @@ export default function DashListOrders() {
                 <Table.Cell>
                   <div className="flex items-center">
                     <img
-                      src={order?.user?.avatar}
+                      src={
+                        order?.user?.avatar ||
+                        "https://cdn.pixabay.com/photo/2016/08/31/11/54/icon-1633249_1280.png"
+                      }
                       alt="avatar"
                       className="h-10 w-10 rounded-full border"
                     />
                     <div className="ml-2 space-y-1">
-                      <p className="font-semibold">{order?.user?.fullName}</p>
+                      <p className="font-semibold">
+                        {order?.user?.fullName || "GUEST"}
+                      </p>
                       <p className="text-slate-500 text-xs">
                         {order?.user?.email}
                       </p>

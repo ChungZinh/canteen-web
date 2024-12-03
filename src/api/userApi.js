@@ -20,6 +20,16 @@ const userApi = {
       },
     });
   },
+
+  deposit(data, currentUser, accessToken) {
+    const url = `/users/deposit`;
+    return axiosClient.post(url, data, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
 };
 
 export default userApi;

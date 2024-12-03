@@ -8,6 +8,7 @@ import authApi from "../api/authApi";
 import { signOutSuccess } from "../redux/user/userSlice";
 import { TbPaperBag } from "react-icons/tb";
 import { nav } from "framer-motion/client";
+import { clearCart, removeFromCart } from "../redux/cart/cartSlice";
 
 export default function Header() {
   const [showHeader, setShowHeader] = useState(true);
@@ -16,7 +17,7 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
-const navigate = useNavigate();
+  const navigate = useNavigate();
   // Xác định mục active dựa trên URL hiện tại
   const getSelectedNav = () => {
     switch (location.pathname) {
@@ -86,6 +87,7 @@ const navigate = useNavigate();
     localStorage.removeItem("refreshToken");
     navigate("/");
     dispatch(signOutSuccess());
+    dispatch(clearCart());
   };
 
   // Kiểm tra nếu hiện tại đang ở trang "/complete-order" thì ẩn header

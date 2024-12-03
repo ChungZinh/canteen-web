@@ -32,6 +32,16 @@ const orderApi = {
     });
   },
 
+  chefUpdateStatus(id, data, currentUser, accessToken) {
+    const url = `/orders/chef/${id}`;
+    return axiosClient.put(url, data, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  },
+
   getStatistics(currentUser, accessToken) {
     const url = `/orders/statistic`;
     return axiosClient.get(url, {
@@ -64,15 +74,6 @@ const orderApi = {
     });
   },
 
-  chefUpdateStatus(id, data, currentUser, accessToken) {
-    const url = `/orders/chef/${id}`;
-    return axiosClient.put(url, data, {
-      headers: {
-        "x-client-id": currentUser?._id,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-  },
 
   completedOrder(id, data) {
     const url = `/orders/complete-order/${id}`;
