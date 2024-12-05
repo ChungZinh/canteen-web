@@ -82,16 +82,32 @@ export default function ChefDashboard() {
     });
   }, []);
 
-  const handleUpdateStatus = async (id, status) => {
-    const response = await orderApi.chefUpdateStatus(
-      id,
-      { status },
+  // const handleUpdateStatus = async (id, status) => {
+  //   const response = await orderApi.chefUpdateStatus(
+  //     id,
+  //     { status },
+  //     currentUser,
+  //     accessToken
+  //   );
+  //   if (response.data) {
+  //     setIsUpdate(!isUpdate);
+  //   }
+  // };
+
+  const handleCancelOrder = async (id) => {
+    const response = await orderApi.refundOrder(
+      {
+        id: id,
+        description: reason,
+      },
       currentUser,
       accessToken
     );
     if (response.data) {
       setIsUpdate(!isUpdate);
     }
+
+    setOpenModal(false);
   };
 
   return (
@@ -203,7 +219,7 @@ export default function ChefDashboard() {
               <Button
                 color="failure"
                 onClick={() => {
-                  handleUpdateStatus(idOrder, "Đã hủy");
+                  handleCancelOrder(idOrder);
                   setOpenModal(false);
                 }}
               >
@@ -363,14 +379,6 @@ const CardOrder = ({
                 Hủy
               </button>
             )}
-            {/* <button className="bg-lime-200 text-lime-600 px-4 py-2 rounded-md">
-            Đang chuẩn bị 
-            </button>
-            <button className="bg-red-200 text-red-600 px-4 py-2 rounded-md">
-              Hủy
-            </button><button className="bg-red-200 text-red-600 px-4 py-2 rounded-md">
-              Hủy
-            </button> */}
           </div>
         </div>
       </div>

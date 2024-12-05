@@ -38,7 +38,7 @@ const CompleteOrder = () => {
     });
     if (response.data) {
       toast.success(response.message);
-      navigate("/dashboard");
+      navigate("/dashboard?tab=listOrders");
     } else {
       toast.error(response.message);
     }

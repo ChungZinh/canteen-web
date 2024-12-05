@@ -1,4 +1,11 @@
-import { Button, Dropdown, Pagination, Table, TextInput } from "flowbite-react";
+import {
+  Button,
+  Dropdown,
+  Pagination,
+  Select,
+  Table,
+  TextInput,
+} from "flowbite-react";
 import { useEffect, useState } from "react";
 import { BiExport } from "react-icons/bi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
@@ -15,7 +22,7 @@ export default function DashListOrders() {
   const { currentUser } = useSelector((state) => state.user);
   const accessToken = localStorage.getItem("accessToken");
   const [page, setPage] = useState(1);
-  const [query, setQuery] = useState({limit: 15});
+  const [query, setQuery] = useState({ limit: 10, all: true });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(10);
@@ -26,6 +33,16 @@ export default function DashListOrders() {
     if (pageN < 1 || pageN > totalPages) return;
     setCurrentPage(pageN);
     setQuery((prev) => ({ ...prev, page: pageN }));
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const search = e.target.value;
+    if (search) {
+      setQuery({ searchTerm: search });
+    } else {
+      setQuery({ limit: 10, all: true });
+    }
   };
 
   useEffect(() => {
@@ -80,8 +97,27 @@ export default function DashListOrders() {
       {/* TABLE */}
       <div className="bg-white rounded-md shadow-md mt-4">
         <div className="flex py-2 px-4 justify-between items-center">
-          <div className="">
-            <TextInput placeholder="Tìm kiếm..." className="w-full" />
+          <div className="flex items-center gap-2">
+            <TextInput
+              placeholder="Search ID"
+              onChange={handleSearch}
+              className="mr-2"
+            />
+            <Select
+              id="status"
+              onChange={(e) => {
+                setQuery((prev) => ({ ...prev, status: e.target.value }));
+              }}
+              className="mr-2"
+            >
+              <option value={""}>Tất cả</option>
+              <option value="Đã đặt">Đã đặt</option>
+              <option value="Đã thanh toán">Đã thanh toán</option>
+              <option value="Đang chuẩn bị">Đang chuẩn bị</option>
+              <option value="Đã chuẩn bị">Đã chuẩn bị</option>
+              <option value="Đã hoàn tất">Đã hoàn tất</option>
+              <option value="Đã hủy">Đã hủy</option>
+            </Select>
           </div>
           <Button className="flex items-center ">
             <BiExport size={20} />
@@ -90,6 +126,7 @@ export default function DashListOrders() {
         </div>
         <Table striped>
           <Table.Head>
+            <Table.HeadCell>ID</Table.HeadCell>
             <Table.HeadCell>Khách hàng</Table.HeadCell>
             <Table.HeadCell>Ngày đặt</Table.HeadCell>
             <Table.HeadCell>Tổng tiền</Table.HeadCell>
@@ -100,6 +137,7 @@ export default function DashListOrders() {
           <Table.Body className="divide-y">
             {orders.map((order) => (
               <Table.Row key={order._id}>
+                <Table.Cell>{order.encodeOrderID || order._id}</Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center">
                     <img

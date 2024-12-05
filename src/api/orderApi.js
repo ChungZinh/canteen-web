@@ -74,10 +74,19 @@ const orderApi = {
     });
   },
 
-
   completedOrder(id, data) {
     const url = `/orders/complete-order/${id}`;
     return axiosClient.put(url, data);
+  },
+
+  refundOrder( data, currentUser, accessToken) {
+    const url = `/orders/refund`;
+    return axiosClient.post(url, data, {
+      headers: {
+        "x-client-id": currentUser?._id,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
   },
 };
 

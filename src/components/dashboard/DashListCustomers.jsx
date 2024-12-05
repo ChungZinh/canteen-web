@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { MdModeEdit, MdMoreVert } from "react-icons/md";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { buildQueryString } from "../../utils/buildQueryString";
 
 export default function DashListCustomers() {
   const btnRef = useRef();
@@ -26,14 +27,15 @@ export default function DashListCustomers() {
   };
 
   const handleDetail = (student) => {
-    navigate(`/dashboard?tab=detailCustomer`, { state: {  student } });
+    navigate(`/dashboard?tab=detailCustomer`, { state: { student } });
   };
 
   useEffect(() => {
     setLoading(true);
     const fetchCustomers = async () => {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await userApi.getUsers(query, currentUser, accessToken);
+      const queryB = buildQueryString(query);
+      const response = await userApi.getUsers(queryB, currentUser, accessToken);
       if (response.data) {
         setCustomers(response.data.users);
         setTotalPages(response.data.totalPages);
